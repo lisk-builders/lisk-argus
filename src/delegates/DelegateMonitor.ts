@@ -275,13 +275,13 @@ function getRound(height): number {
 /***
  * Get the delegates from the list that still have to forge this round
  * @param {ForgerDetail[]} nextForgers list of forging delegate details
- * @param {number} height current netowrk height
+ * @param {number} height current network height
  * @returns {ForgerDetail[]} delegates that still have to forge in that round
  */
 function getRoundDelegates(nextForgers: ForgerDetail[], height: number): ForgerDetail[] {
-    const currentRound = this.getRound(height);
+    const currentRound = getRound(height);
     return nextForgers.filter((delegate, index) =>
-        currentRound === this.getRound(height + index + 1));
+        currentRound === getRound(height + index + 1));
 }
 
 /***
