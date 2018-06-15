@@ -2,7 +2,7 @@ import {PeerManager} from '../peers/PeerManager';
 import * as events from 'events';
 import * as _ from 'underscore';
 import * as log from 'winston';
-import {Block, DelegateDetails, ForgerDetail} from '../peers/LiskClient';
+import {Block, DelegateDetails, ForgerDetail, ForgerMeta} from '../peers/LiskClient';
 
 /***
  * The DelegateMonitor keeps track of the delegate ranks and forging status of delegates on a Lisk chain
@@ -11,10 +11,14 @@ export class DelegateMonitor extends events.EventEmitter {
     public static readonly EVENT_DELEGATE_RANK_CHANGE = 'd_rank_change';
     public static readonly EVENT_DELEGATE_NEW_TOP = 'd_new_top';
     public static readonly EVENT_DELEGATE_DROPPED_TOP = 'd_dropped_top';
+    public static readonly EVENT_DELEGATE_STATUS_CHANGED = 'd_status_changed';
+    public static readonly EVENT_DELEGATE_BLOCK_MISSED = 'd_block_missed';
 
-    private blocks: Map<Number, Object> = new Map<Number, Object>();
+    private blocks: Map<Number, Block> = new Map<Number, Block>();
     private delegates: Map<String, Delegate> = new Map<String, Delegate>();
     private nextForgers: ForgerDetail[] = [];
+    private lastForger: Delegate;
+    private currentSlot: number;
 
     /***
      * Instantiates the DelegateMonitor
@@ -57,7 +61,12 @@ export class DelegateMonitor extends events.EventEmitter {
     private updateDelegateStatus(): void {
         let bestHeight = this.peerManager.getBestHeight();
         for (let [key, delegate] of this.delegates) {
+            let oldStatus = delegate.status;
             delegate.update(bestHeight);
+
+            if (delegate.status != oldStatus) {
+                this.emit(DelegateMonitor.EVENT_DELEGATE_STATUS_CHANGED, delegate, oldStatus, delegate.status)
+            }
         }
     }
 
@@ -66,14 +75,28 @@ export class DelegateMonitor extends events.EventEmitter {
      * @returns {Promise<void>}
      */
     private updateForgers(): Promise<void> {
-        return this.peerManager.getBestHTTPPeer().client.getForgersHTTP().then(data => this.processForgers(data.data))
+        return this.peerManager.getBestHTTPPeer().client.getForgersHTTP().then(data => this.processForgers(data.data, data.meta))
     }
 
     /***
      * Process a list of forgers from an API response
      * @param {Array<ForgerDetail>} forgers
+     * @param {ForgerMeta} slotDetails
      */
-    private processForgers(forgers: Array<ForgerDetail>): void {
+    private processForgers(forgers: Array<ForgerDetail>, slotDetails: ForgerMeta): void {
+        // If a slot is over check whether the last forger actually forged a block
+        // We grant the network a 1 slot period for the block to spread otherwise it is probably missed
+        if (this.currentSlot < slotDetails.currentSlot) {
+            const bestHeight = _.max(Array.from(this.blocks.keys())) as number;
+            if (this.lastForger != null &&
+                this.blocks.get(bestHeight).generatorPublicKey !== this.lastForger.details.account.publicKey &&
+                this.blocks.get(bestHeight - 1).generatorPublicKey !== this.lastForger.details.account.publicKey) {
+                this.emit(DelegateMonitor.EVENT_DELEGATE_BLOCK_MISSED, this.lastForger)
+            }
+
+            this.lastForger = this.delegates.get(this.nextForgers[0].publicKey);
+        }
+
         this.nextForgers = forgers;
         let roundDelegates = getRoundDelegates(this.nextForgers, this.peerManager.getBestHeight());
         for (let forger of forgers) {
@@ -83,6 +106,8 @@ export class DelegateMonitor extends events.EventEmitter {
                 return forger.publicKey == item.publicKey;
             }).length != 0);
         }
+
+        this.currentSlot = slotDetails.currentSlot;
     }
 
     /***
@@ -161,7 +186,7 @@ export class DelegateMonitor extends events.EventEmitter {
         // Update details
         for (let [key, delegate] of delegateMap) {
             if (this.delegates.get(delegate.account.publicKey)) {
-                this.delegates.get(delegate.account.publicKey).details = delegate
+                this.delegates.get(delegate.account.publicKey).details = delegate;
             }
         }
     }
@@ -191,27 +216,6 @@ export class DelegateMonitor extends events.EventEmitter {
     private handleDroppedDelegate(delegate: DelegateDetails): void {
         this.delegates.delete(delegate.account.publicKey);
         this.emit(DelegateMonitor.EVENT_DELEGATE_DROPPED_TOP, delegate);
-    }
-
-    /***
-     * Handle a missed block
-     */
-    private handleMissedBlock(): void {
-
-    }
-
-    /***
-     * Handle a delegate not forging for 2+ blocks
-     */
-    private handleNotForging(): void {
-
-    }
-
-    /***
-     * Handle a delegate resuming to forge after not forging for 2+ block
-     */
-    private handleForgingRestored(): void {
-
     }
 }
 
