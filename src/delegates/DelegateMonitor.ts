@@ -90,8 +90,9 @@ export class DelegateMonitor extends events.EventEmitter {
             const bestHeight = _.max(Array.from(this.blocks.keys())) as number;
             if (this.lastForger != null &&
                 this.blocks.get(bestHeight).generatorPublicKey !== this.lastForger.details.account.publicKey &&
-                this.blocks.get(bestHeight - 1).generatorPublicKey !== this.lastForger.details.account.publicKey) {
-                this.emit(DelegateMonitor.EVENT_DELEGATE_BLOCK_MISSED, this.lastForger)
+                this.blocks.get(bestHeight - 1).generatorPublicKey !== this.lastForger.details.account.publicKey &&
+                this.blocks.get(bestHeight - 2).generatorPublicKey !== this.lastForger.details.account.publicKey) {
+                this.emit(DelegateMonitor.EVENT_DELEGATE_BLOCK_MISSED, this.lastForger);
             }
 
             this.lastForger = this.delegates.get(this.nextForgers[0].publicKey);
