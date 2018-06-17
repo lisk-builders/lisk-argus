@@ -17,11 +17,11 @@ export class PeerManager {
 
     constructor(private socketServer: SocketServer, private httpPort: number, private wsPort: number, readonly nonce: string) {
         this.addPeer({
-            ip: 'betanet.lisk.io',
-            wsPort: 5001,
-            httpPort: 5000,
-            nonce: '',
-            version: '1.0.0-beta.6'
+            ip: config.seedNode.host,
+            wsPort: config.seedNode.wsPort,
+            httpPort: config.seedNode.httpPort,
+            version: config.seedNode.version,
+            nonce: ''
         });
         setInterval(() => this.updatePeers(), 1000);
 

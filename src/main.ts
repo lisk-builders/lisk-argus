@@ -3,16 +3,19 @@ import {SocketServer} from './websockets/SocketServer';
 import {DelegateMonitor} from './delegates/DelegateMonitor';
 import {BlockchainManager} from './blocks/BlockchainManager';
 import * as crypto from 'crypto';
+import {NotificationManager} from './notifications/NotificationManager';
 
-let nonce = 'monitoring_' + crypto.randomBytes(10).toString('hex').slice(0, 5);
+const nonce = 'monitoring_' + crypto.randomBytes(10).toString('hex').slice(0, 5);
 
-let socketServer = new SocketServer(parseInt(process.argv[2]), nonce);
-let peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]), nonce);
+const socketServer = new SocketServer(parseInt(process.argv[2]), nonce);
+const peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]), nonce);
 
-let delegateMonitor = new DelegateMonitor(peerManager);
-
+//TODO give the peers time connect
 setTimeout(() => {
-    let blockManager = new BlockchainManager(peerManager);
+    const delegateMonitor = new DelegateMonitor(peerManager);
+    const blockManager = new BlockchainManager(peerManager);
     blockManager.initalizeCache();
-}, 3000);
+
+    const notifications = new NotificationManager(delegateMonitor, blockManager, peerManager);
+}, 5000);
 
