@@ -3,6 +3,7 @@ import {LiskPeer} from '../peers/Peer';
 import {Chain} from './Chain';
 import * as _ from 'underscore'
 import {EventEmitter} from 'events';
+import * as log from 'winston';
 
 /***
  * BlockchainManager keeps tracks of all chains and the associated peers on the Lisk network
@@ -98,7 +99,7 @@ export class BlockchainManager extends EventEmitter {
                     // Join new chain
                     this._peerChainMap.set(peer.status.nonce, newChain.id);
 
-                    console.log('FORK', peer.status.nonce, peer.status.height, peer.status.broadhash);
+                    log.debug('FORK', peer.status.nonce, peer.status.height, peer.status.broadhash);
                     this.emit('FORK', peer.status.nonce, newChain.id)
                 } else {
                     // Forked with unknown parent chain using initial block
@@ -110,21 +111,21 @@ export class BlockchainManager extends EventEmitter {
                     this._peerChainMap.set(peer.status.nonce, newChain.id);
 
                     this.emit('FORK_UNKNOWN_CHAIN', peer.status.nonce, newChain.id);
-                    console.log('FORK_UNKNOWN_CHAIN', peer.status.nonce);
+                    log.debug('FORK_UNKNOWN_CHAIN', peer.status.nonce);
                 }
             } else if (!this._peerChainMap.has(peer.status.nonce)) {
                 // Client joined chain for the first time
                 this._peerChainMap.set(peer.status.nonce, peerChain.id);
                 this.emit('CHAIN_JOINED', peer);
-                console.log('CHAIN_JOINED', peer.status.nonce);
+                log.debug('CHAIN_JOINED', peer.status.nonce);
             } else if (this._peerChainMap.get(peer.status.nonce) != peerChain.id) {
                 // Moved to another chain
                 this._peerChainMap.set(peer.status.nonce, peerChain.id);
                 this.emit('CHAIN_CHANGED', peer);
-                console.log('CHAIN_CHANGED', peer.status.nonce);
+                log.debug('CHAIN_CHANGED', peer.status.nonce);
             } else {
                 // Healthy and on the same chain
-                //console.log('HEALTHY', peer.status.nonce);
+                //log.debug('HEALTHY', peer.status.nonce);
             }
         }
     }
