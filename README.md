@@ -33,6 +33,10 @@ Install all the dependencies
 
 Update the config file ```config.json```. The default config file is configured to run on the current version of the Lisk betanet.
 
+Run the monitor
+
+``npm start``
+
 ### Implement own notification adapters
 
 To implement new notification adapters create a class that implements the ``NotificationAdapter`` and register it in the ``NotificationManager``
