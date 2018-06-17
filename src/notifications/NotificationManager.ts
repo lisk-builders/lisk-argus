@@ -2,7 +2,7 @@ import {Delegate, DelegateMonitor, DelegateStatus} from '../delegates/DelegateMo
 import {BlockchainManager} from '../blocks/BlockchainManager';
 import {PeerManager} from '../peers/PeerManager';
 import * as request from 'request-promise-native'
-import {getTimeFromBlockchainEpoch} from '../utils/generic';
+import {convertEpochToSeconds} from '../utils/generic';
 
 const config = require('../config.json');
 
@@ -18,7 +18,7 @@ export class NotificationManager {
         delegateMonitor.on(DelegateMonitor.EVENT_DELEGATE_NEW_TOP, (delegate) => this.adapters.forEach((adapter) => adapter.handleDelegateNewTop(delegate)));
 
         if (config.notifications.riot.active) {
-            const riot = new LiskChatAdapter(config.notifications.riot.host, config.notifications.riot.username, config.notifications.riot.password, '@slamper', 'betanet');
+            const riot = new LiskChatAdapter(config.notifications.riot.host, config.notifications.riot.username, config.notifications.riot.password, config.notifications.riot.defaultChannel, 'betanet');
             this.adapters.push(riot)
         }
     }
@@ -86,7 +86,7 @@ export class LiskChatAdapter implements NotificationAdapter {
             ':rotating_light: *Missed Block* :rotating_light: \n' +
             'Delegate: `' + delegate.details.username + '`\n' +
             'Number of missed blocks: `' + (delegate.details.missedBlocks + 1) + '`\n' +
-            'Last block: `' + (delegate.lastBlock ? LiskChatAdapter.timeSince(getTimeFromBlockchainEpoch(delegate.lastBlock.timestamp)) + ' ago' : 'never') + '`\n' +
+            'Last block: `' + (delegate.lastBlock ? LiskChatAdapter.timeSince(convertEpochToSeconds(delegate.lastBlock.timestamp)) + ' ago' : 'never') + '`\n' +
             'Network: `' + this.network + '`')
     }
 
@@ -105,7 +105,7 @@ export class LiskChatAdapter implements NotificationAdapter {
 
     static timeSince(date: number): string {
 
-        let seconds = Math.floor((new Date().getUTCMilliseconds() - date) / 1000);
+        let seconds = Math.floor((new Date().getTime() / 1000 - date));
         let interval = Math.floor(seconds / 31536000);
 
         if (interval > 1) {
