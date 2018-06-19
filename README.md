@@ -1,4 +1,4 @@
-##lisk_argus
+## lisk_argus
 
 Lisk Argus is a monitoring software that keeps track of the Lisk network.
 
