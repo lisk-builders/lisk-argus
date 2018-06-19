@@ -208,7 +208,7 @@ export class DelegateMonitor extends events.EventEmitter {
      * @param delegate affected delegate
      * @param diff rank difference (negative if rank is better now) e.g. 22=>20=-2
      */
-    private handleDelegateRankChanged(delegate, diff): void {
+    private handleDelegateRankChanged(delegate: DelegateDetails, diff: number): void {
         this.emit(DelegateMonitor.EVENT_DELEGATE_RANK_CHANGE, delegate, diff)
     }
 

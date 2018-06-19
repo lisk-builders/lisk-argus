@@ -66,7 +66,7 @@ export class RocketChatAdapter implements NotificationAdapter {
             'Network: `' + this.network + '`')
     }
 
-    handleDelegateRankChanged(delegate: Delegate, delta: number): void {
+    handleDelegateRankChanged(delegate: DelegateDetails, delta: number): void {
     }
 
     handleDelegateStatusChanged(delegate: Delegate, oldStatus: DelegateStatus, newStatus: DelegateStatus): void {

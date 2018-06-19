@@ -24,7 +24,7 @@ export class NotificationManager {
         }
 
         if (config.notifications.telegram.active) {
-            const telegram = new TelegramAdapter(config.notifications.telegram.botToken);
+            const telegram = new TelegramAdapter(config.notifications.telegram.botToken, 'betanet');
             this.adapters.push(telegram)
         }
     }
@@ -36,7 +36,7 @@ export interface NotificationAdapter {
 
     handleDelegateStatusChanged(delegate: Delegate, oldStatus: DelegateStatus, newStatus: DelegateStatus): void;
 
-    handleDelegateRankChanged(delegate: Delegate, delta: number): void;
+    handleDelegateRankChanged(delegate: DelegateDetails, delta: number): void;
 
     handleDelegateNewTop(delegate: DelegateDetails): void;
 
