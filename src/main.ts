@@ -12,10 +12,13 @@ const peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]
 
 //TODO give the peers time connect
 setTimeout(() => {
-    const delegateMonitor = new DelegateMonitor(peerManager);
     const blockManager = new BlockchainManager(peerManager);
     blockManager.initalizeCache();
 
-    const notifications = new NotificationManager(delegateMonitor, blockManager, peerManager);
+    const delegateMonitor = new DelegateMonitor(peerManager);
+
+    delegateMonitor.start().then(() => {
+        const notifications = new NotificationManager(delegateMonitor, blockManager, peerManager);
+    });
 }, 5000);
 

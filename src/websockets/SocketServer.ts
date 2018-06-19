@@ -40,7 +40,6 @@ export class SocketServer extends EventEmitter {
         });
 
         socketCluster.on('workerStart', (id, msg) => {
-            console.log('sending to worker');
         });
 
 

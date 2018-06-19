@@ -68,12 +68,13 @@ export class Chain {
      * Checks whether the node with the give status is on this chain and updates the chain if the node has
      * a new block.
      * @param {NodeStatus} status
+     * @param force
      * @returns {boolean}
      */
-    public checkOnChainAndUpdate(status: NodeStatus): boolean {
+    public checkOnChainAndUpdate(status: NodeStatus, force?: boolean): boolean {
         if (!this._blocks.has(status.height)) {
             // Node is probably stuck or on another chain
-            if (Math.abs(this.getBestHeight() - status.height) > 50) return false;
+            if (!force && Math.abs(this.getBestHeight() - status.height) > 50) return false;
 
             let block = {
                 id: '',

@@ -27,9 +27,25 @@ export class DelegateMonitor extends events.EventEmitter {
     constructor(readonly peerManager: PeerManager) {
         super();
         this.peerManager = peerManager;
+    }
 
+    /***
+     * Starts the update loop of delegates
+     * @returns {Promise<void>}
+     */
+    public start(): Promise<void> {
         // Start update ticks
-        setInterval(() => this.update().catch((err) => log.error(err)), 2000)
+        let updateFunction;
+
+        updateFunction = () => {
+            this.update().then(() => {
+                setTimeout(updateFunction, 2000)
+            }).catch((err) => log.error(err))
+        };
+
+        return this.update().catch((err) => log.error(err)).then(() => {
+            updateFunction();
+        });
     }
 
     /***

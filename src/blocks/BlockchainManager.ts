@@ -71,6 +71,11 @@ export class BlockchainManager extends EventEmitter {
             }
         }
 
+        // Sort peers so chain updates happen in order
+        peers.sort((a, b) => {
+            return (a.status ? a.status.height : 0) - (b.status ? b.status.height : 0)
+        });
+
         // STEP 1 - Process peers - update chains
         // Fork if needed
         for (let peer of peers) {
@@ -92,14 +97,22 @@ export class BlockchainManager extends EventEmitter {
 
                     let newChain = new Chain(...oldChain.blocks.slice(0, oldChain.blocks.length - 1));
                     // Push the new block to the chain
-                    newChain.checkOnChainAndUpdate(peer.status);
+                    newChain.checkOnChainAndUpdate(peer.status, true);
 
                     // Add new chain to list
                     this._chains.push(newChain);
                     // Join new chain
                     this._peerChainMap.set(peer.status.nonce, newChain.id);
 
-                    log.debug('FORK', peer.status.nonce, peer.status.height, peer.status.broadhash);
+                    log.debug('FORK', {
+                        ip: peer.options.ip,
+                        nonce: peer.options.nonce,
+                        peer_height: peer.status.height,
+                        peer_broadhash: peer.status.broadhash,
+                        chain_height: oldChain.getBestHeight(),
+                        new_chain: newChain.id,
+                        old_chain: oldChain.id,
+                    });
                     this.emit('FORK', peer.status.nonce, newChain.id)
                 } else {
                     // Forked with unknown parent chain using initial block
@@ -110,19 +123,36 @@ export class BlockchainManager extends EventEmitter {
                     // Join new chain
                     this._peerChainMap.set(peer.status.nonce, newChain.id);
 
-                    this.emit('FORK_UNKNOWN_CHAIN', peer.status.nonce, newChain.id);
+                    this.emit('FORK_UNKNOWN_CHAIN', {
+                        ip: peer.options.ip,
+                        nonce: peer.options.nonce,
+                        peer_height: peer.status.height,
+                        peer_broadhash: peer.status.broadhash,
+                        new_chain: newChain.id,
+                    });
                     log.debug('FORK_UNKNOWN_CHAIN', peer.status.nonce);
                 }
             } else if (!this._peerChainMap.has(peer.status.nonce)) {
                 // Client joined chain for the first time
                 this._peerChainMap.set(peer.status.nonce, peerChain.id);
-                this.emit('CHAIN_JOINED', peer);
+                this.emit('CHAIN_JOINED', {
+                    ip: peer.options.ip,
+                    nonce: peer.options.nonce,
+                    peer_height: peer.status.height,
+                    peer_broadhash: peer.status.broadhash,
+                    new_chain: peerChain.id,
+                });
                 log.debug('CHAIN_JOINED', peer.status.nonce);
             } else if (this._peerChainMap.get(peer.status.nonce) != peerChain.id) {
                 // Moved to another chain
                 this._peerChainMap.set(peer.status.nonce, peerChain.id);
                 this.emit('CHAIN_CHANGED', peer);
-                log.debug('CHAIN_CHANGED', peer.status.nonce);
+                log.debug('CHAIN_CHANGED', {
+                    ip: peer.options.ip,
+                    nonce: peer.options.nonce,
+                    newChain: peerChain.id,
+                    peer_height: peer.status.height
+                });
             } else {
                 // Healthy and on the same chain
                 //log.debug('HEALTHY', peer.status.nonce);
@@ -137,6 +167,8 @@ export class BlockchainManager extends EventEmitter {
         const chainStats = _.countBy(Array.from(this._peerChainMap.values()), (chainID) => chainID);
         let bestPeerNumber = 0;
         let bestChain;
+
+        console.log(chainStats);
 
         for (let chainID in chainStats) {
             const peerNumber = chainStats[chainID];

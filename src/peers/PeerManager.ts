@@ -44,7 +44,7 @@ export class PeerManager {
      * @param {PeerInfo} peer
      */
     public addPeer(peer: PeerInfo) {
-        if (peer.nonce && peer.nonce === this.nonce) return;
+        if (peer.nonce && (peer.nonce === this.nonce || peer.nonce.indexOf('monitoring') != -1)) return;
         if (this._peers.has(peer.nonce)) return log.debug('peer not added: already connected to peer');
         if (!semver.satisfies(peer.version, config.minVersion)) return log.debug('peer not added: does not satisfy minVersion', {
             version: peer.version,
@@ -113,7 +113,7 @@ export class PeerManager {
             this.addPeer(peer)
         }
 
-        log.info(`connected to ${_.countBy(Array.from(this._peers.values()).map((peer) => peer.state), (state) => PeerState[state])['ONLINE']} peers`);
+        log.debug(`connected to ${_.countBy(Array.from(this._peers.values()).map((peer) => peer.state), (state) => PeerState[state])['ONLINE']} peers`);
     }
 
     /***
