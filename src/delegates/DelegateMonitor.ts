@@ -47,11 +47,6 @@ export class DelegateMonitor extends events.EventEmitter {
             .then(() => this.updateBlocks())
             .then(() => this.updateForgers())
             .then(() => this.updateDelegateStatus())
-            .then(() => {
-                console.log(JSON.stringify(_.countBy(Array.from(this.delegates.values()), (item) => {
-                    return DelegateStatus[item.status];
-                })));
-            })
     }
 
     /***
@@ -241,7 +236,7 @@ export class Delegate {
         const networkRound = getRound(height);
         let awaitingSlot = -1;
         let delegateRound;
-        if (this.details.producedBlocks > 0 && this.lastBlock) {
+        if (this.lastBlock != null) {
             delegateRound = getRound(this.lastBlock.height);
             awaitingSlot = networkRound - delegateRound;
         } else if (this.details.producedBlocks == 0) {
@@ -266,9 +261,6 @@ export class Delegate {
         } else if (awaitingSlot === 2) {
             // Awaiting slot, but missed block in last round
             this.status = DelegateStatus.AWAITING_MISSED_LAST;
-        } else if (!this.lastBlock) {
-            // Awaiting status or unprocessed
-            this.status = DelegateStatus.AWAITING;
         } else if (awaitingSlot > 1) {
             // Awaiting slot, but missed block in more than 1 rounds
             this.status = DelegateStatus.AWAITING_MISSED_MORE;
@@ -301,5 +293,5 @@ function getRoundDelegates(nextForgers: ForgerDetail[], height: number): ForgerD
  * DelegateStatus indicates the forging status of a delegate
  */
 export enum DelegateStatus {
-    FORGED_THIS_ROUND, MISSED_THIS_BLOCK, MISSED_MORE, AWAITING_MISSED_LAST, AWAITING_MISSED_MORE, AWAITING_FORGED_LAST, AWAITING, NEW
+    FORGED_THIS_ROUND, MISSED_THIS_BLOCK, MISSED_MORE, AWAITING_MISSED_LAST, AWAITING_MISSED_MORE, AWAITING_FORGED_LAST, NEW
 }
