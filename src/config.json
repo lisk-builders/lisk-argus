@@ -8,6 +8,10 @@
       "defaultChannel": "",
       "username": "",
       "password": ""
+    },
+    "telegram": {
+      "active": false,
+      "botToken": ""
     }
   },
   "seedNode": {
