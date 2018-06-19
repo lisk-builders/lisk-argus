@@ -80,7 +80,7 @@ export class BlockchainManager extends EventEmitter {
         // Fork if needed
         for (let peer of peers) {
             if (peer.status == null) continue;
-            if (peer.status.broadhash === '') continue;
+            if (peer.status.broadhash.length == 0) continue;
 
             let peerChain;
             for (let chain of this._chains) {
@@ -105,12 +105,12 @@ export class BlockchainManager extends EventEmitter {
                     // Join new chain
                     this._peerChainMap.set(peer.status.nonce, newChain.id);
 
-                    log.info('FORK', {
+                    log.debug('FORK', {
                         ip: peer.options.ip,
                         nonce: peer.options.nonce,
                         peerHeight: peer.status.height,
                         peerBroadhash: peer.status.broadhash,
-                        oldChainBroadhash: oldChain.blocks[oldChain.getBestHeight()] != null ? oldChain.blocks[oldChain.getBestHeight()].broadhash : '',
+                        oldChainBroadhash: oldChain.blocksMap.get(oldChain.getBestHeight()).broadhash,
                         chainHeight: oldChain.getBestHeight(),
                         newChain: newChain.id,
                         oldChain: oldChain.id,
@@ -132,7 +132,7 @@ export class BlockchainManager extends EventEmitter {
                         peerBroadhash: peer.status.broadhash,
                         newChain: newChain.id,
                     });
-                    log.info('FORK_UNKNOWN_CHAIN', peer.status.nonce);
+                    log.debug('FORK_UNKNOWN_CHAIN', peer.status.nonce);
                 }
             } else if (!this._peerChainMap.has(peer.status.nonce)) {
                 // Client joined chain for the first time
@@ -144,7 +144,7 @@ export class BlockchainManager extends EventEmitter {
                     peerBroadhash: peer.status.broadhash,
                     newChain: peerChain.id,
                 });
-                log.info('CHAIN_JOINED', peer.status.nonce);
+                log.debug('CHAIN_JOINED', peer.status.nonce);
             } else if (this._peerChainMap.get(peer.status.nonce) != peerChain.id) {
                 // Moved to another chain
                 let oldChain = _.find(this._chains, (chain) => {
@@ -152,7 +152,7 @@ export class BlockchainManager extends EventEmitter {
                 });
                 this._peerChainMap.set(peer.status.nonce, peerChain.id);
                 this.emit('CHAIN_CHANGED', peer);
-                log.info('CHAIN_CHANGED', {
+                log.debug('CHAIN_CHANGED', {
                     ip: peer.options.ip,
                     nonce: peer.options.nonce,
                     newChain: peerChain.id,
@@ -161,7 +161,7 @@ export class BlockchainManager extends EventEmitter {
                 });
             } else {
                 // Healthy and on the same chain
-                //log.info('HEALTHY', peer.status.nonce);
+                //log.debug('HEALTHY', peer.status.nonce);
             }
         }
     }
@@ -173,8 +173,6 @@ export class BlockchainManager extends EventEmitter {
         const chainStats = _.countBy(Array.from(this._peerChainMap.values()), (chainID) => chainID);
         let bestPeerNumber = 0;
         let bestChain;
-
-        console.log(chainStats);
 
         for (let chainID in chainStats) {
             const peerNumber = chainStats[chainID];

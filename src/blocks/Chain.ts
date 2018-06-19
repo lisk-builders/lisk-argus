@@ -26,6 +26,10 @@ export class Chain {
         return Array.from(this._blocks.values())
     }
 
+    get blocksMap(): Map<number, BlockStamp> {
+        return this._blocks;
+    }
+
     private _id: number;
 
     get id(): number {
