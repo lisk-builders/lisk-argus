@@ -25,7 +25,7 @@ Data collected includes:
 
 Clone the repository
 
-``git clone https://github.com/Slamper/lisk_argus``
+``git clone https://github.com/lisk-builders/lisk_argus``
 
 Install all the dependencies
 
