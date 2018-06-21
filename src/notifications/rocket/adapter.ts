@@ -7,6 +7,8 @@ import {DelegateDetails} from '../../peers/LiskClient';
 export class RocketChatAdapter implements NotificationAdapter {
     private authSession;
 
+    private notificationBlacklist: Map<string, boolean> = new Map<string, boolean>();
+
     constructor(readonly host, readonly username, readonly password, readonly defaultChannel, readonly network) {
         this.authenticate()
     }
@@ -48,6 +50,16 @@ export class RocketChatAdapter implements NotificationAdapter {
     }
 
     handleMissedBlock(delegate: Delegate): void {
+        if (delegate.status == DelegateStatus.AWAITING_MISSED_MORE || delegate.status == DelegateStatus.MISSED_MORE) return;
+        if (this.notificationBlacklist.has(delegate.details.username)) return;
+
+        this.sendMessage(this.defaultChannel,
+            ':rotating_light: *Missed Block* :rotating_light: \n' +
+            'Delegate: `' + delegate.details.username + '` || ' +
+            'Number of missed blocks: `' + (delegate.details.missedBlocks + 1) + '` || ' +
+            'Last block: `' + (delegate.lastBlock ? RocketChatAdapter.timeSince(convertEpochToSeconds(delegate.lastBlock.timestamp)) + ' ago' : 'never') + '`\n' +
+            'Network: `' + this.network + '`')
+        this.notificationBlacklist.set(delegate.details.username, true);
     }
 
     handleDelegateDroppedTop(delegate: DelegateDetails): void {
@@ -75,18 +87,12 @@ export class RocketChatAdapter implements NotificationAdapter {
                 ':green_heart: *Forging resumed* :green_heart: \n' +
                 'Delegate `' + delegate.details.username + '` is now forging again \n' +
                 'Network: `' + this.network + '`')
+            this.notificationBlacklist.delete(delegate.details.username)
         }
         else if (newStatus === DelegateStatus.MISSED_MORE && oldStatus === DelegateStatus.AWAITING_MISSED_LAST) {
             this.sendMessage(this.defaultChannel,
                 ':red_circle: *Forging stopped* :red_circle: \n' +
                 'Delegate `' + delegate.details.username + '` has missed more than 1 block and is :red_circle: now \n' +
-                'Network: `' + this.network + '`')
-        } else if (newStatus === DelegateStatus.MISSED_THIS_BLOCK && oldStatus === DelegateStatus.AWAITING_FORGED_LAST) {
-            this.sendMessage(this.defaultChannel,
-                ':rotating_light: *Missed Block* :rotating_light: \n' +
-                'Delegate: `' + delegate.details.username + '` || ' +
-                'Number of missed blocks: `' + (delegate.details.missedBlocks + 1) + '` || ' +
-                'Last block: `' + (delegate.lastBlock ? RocketChatAdapter.timeSince(convertEpochToSeconds(delegate.lastBlock.timestamp)) + ' ago' : 'never') + '`\n' +
                 'Network: `' + this.network + '`')
         }
     }

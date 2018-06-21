@@ -60,8 +60,8 @@ export class DelegateMonitor extends events.EventEmitter {
      */
     private update(): Promise<void> {
         return this.updateDelegates()
-            .then(() => this.updateBlocks())
             .then(() => this.updateForgers())
+            .then(() => this.updateBlocks())
             .then(() => this.updateDelegateStatus())
     }
 
