@@ -72,7 +72,7 @@ export class RocketChatAdapter implements NotificationAdapter {
 
     handleDelegateNewTop(delegate: DelegateDetails): void {
         this.sendMessage(this.defaultChannel,
-            ':confetti_ball: *Congratulations* :confetti_ball:  \n' +
+            ':minions_hands: *Congratulations* :minions_hands:  \n' +
             'Delegate `' + delegate.username + '` was elevated into a forging position || ' +
             'Rank: `' + delegate.rank + '`\n' +
             'Network: `' + this.network + '`')
