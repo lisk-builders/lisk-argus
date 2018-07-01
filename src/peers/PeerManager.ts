@@ -114,6 +114,8 @@ export class PeerManager {
         }
 
         log.debug(`connected to ${_.countBy(Array.from(this._peers.values()).map((peer) => peer.state), (state) => PeerState[state])['ONLINE']} peers`);
+        log.debug(`State of the network: ${JSON.stringify(_.countBy(Array.from(this._peers.values()).map((peer) => peer.status != null && peer.state == PeerState.ONLINE ? peer.status.height : 0), (height) => height))} peers`);
+        log.debug(`disconnected from ${_.countBy(Array.from(this._peers.values()).map((peer) => peer.state), (state) => PeerState[state])['OFFLINE']} peers`);
     }
 
     /***
