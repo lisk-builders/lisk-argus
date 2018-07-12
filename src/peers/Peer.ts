@@ -5,6 +5,7 @@ import * as _ from 'underscore'
 
 export enum LiskPeerEvent {
     statusUpdated = "STATUS_UPDATED",
+    peersUpdated = "PEERS_UPDATED",
     nodeStuck = "NODE_STUCK",
 }
 
@@ -148,7 +149,10 @@ export class LiskPeer extends events.EventEmitter {
         this.client.getStatus()
             .then((status) => this.handleStatusUpdate(status))
             .then(() => this.client.getPeers())
-            .then((res) => this.peers = res.peers)
+            .then((res) => {
+                this.peers = res.peers;
+                this.emit(LiskPeerEvent.peersUpdated, res.peers);
+            })
             .catch((err) => log.warn(`could not update status of ${this._options.ip}:${this._options.wsPort}: ${err}`));
 
     }
