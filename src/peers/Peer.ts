@@ -3,6 +3,12 @@ import {LiskClient, NodeStatus, PeerInfo} from './LiskClient';
 import * as log from 'winston'
 import * as _ from 'underscore'
 
+export enum LiskPeerEvent {
+    statusUpdated = "STATUS_UPDATED",
+    peersUpdated = "PEERS_UPDATED",
+    nodeStuck = "NODE_STUCK",
+}
+
 /***
  * LiskPeer is a wrapper for LiskClient that automatically updates the node status and keeps track of the connection
  * and checks whether the node is sane (not stuck)
@@ -78,7 +84,7 @@ export class LiskPeer extends events.EventEmitter {
             this._stuck = false;
         } else if (!this._stuck && Date.now() - this._lastHeightUpdate > 20000) {
             this._stuck = true;
-            this.emit('NODE_STUCK')
+            this.emit(LiskPeerEvent.nodeStuck);
         }
 
         // Apply new status
@@ -87,7 +93,7 @@ export class LiskPeer extends events.EventEmitter {
         this._options.nonce = status.nonce;
 
         // Emit the status update
-        this.emit('STATUS_UPDATE', status)
+        this.emit(LiskPeerEvent.statusUpdated, status);
     }
 
     /***
@@ -143,7 +149,10 @@ export class LiskPeer extends events.EventEmitter {
         this.client.getStatus()
             .then((status) => this.handleStatusUpdate(status))
             .then(() => this.client.getPeers())
-            .then((res) => this.peers = res.peers)
+            .then((res) => {
+                this.peers = res.peers;
+                this.emit(LiskPeerEvent.peersUpdated, res.peers);
+            })
             .catch((err) => log.warn(`could not update status of ${this._options.ip}:${this._options.wsPort}: ${err}`));
 
     }
