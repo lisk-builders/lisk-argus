@@ -1,7 +1,7 @@
 import * as url from 'url';
+import {WAMPServer} from './wamp/WAMPServer';
 
 const SCWorker = require('socketcluster/scworker');
-const WAMPServer = require('wamp-socket-cluster/WAMPServer');
 
 /***
  * Worker is a SocketCluster Worker that emulates basic Lisk Core behaviour and forwards status updates
@@ -31,11 +31,10 @@ class Worker extends SCWorker {
     };
 
     run() {
-        const wampServer = new WAMPServer();
-        wampServer.registerRPCEndpoints(this.rpcEndpoints);
 
         this.scServer.on('connection', (socket) => {
-            wampServer.upgradeToWAMP(socket);
+            WAMPServer.registerWAMP(socket);
+            WAMPServer.registerRPCEndpoints(socket, this.rpcEndpoints);
 
             const nonce = url.parse(socket.request.url, true).query.nonce;
             this.sendToMaster({event: 'connect', data: nonce});

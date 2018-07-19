@@ -1,6 +1,6 @@
 import * as socketCluster from 'socketcluster-client'
 import * as request from 'request-promise-native'
-import WAMPClient = require('wamp-socket-cluster/WAMPClient');
+import {WAMPClient} from '../websockets/wamp/WAMPClient';
 
 /***
  * LiskClient is a client for the Lisk Core Websocket and HTTP protocol.
@@ -35,9 +35,8 @@ export class LiskClient {
 
     public connect(connectHandler, disconnectHandler, errorHandler) {
         // Initiate the connection to the server
-        let rpcClient = new WAMPClient(5000);
         this.socket = socketCluster.create(this.options);
-        rpcClient.upgradeToWAMP(this.socket);
+        WAMPClient.registerWAMP(this.socket);
 
         this.socket.on('connect', connectHandler);
         this.socket.on('close', disconnectHandler);
