@@ -1,6 +1,5 @@
 import * as crypto from 'crypto';
 import {Block, NodeStatus} from '../peers/LiskClient';
-import * as _ from 'underscore'
 
 /***
  * Chain represents a chain on the Lisk network
@@ -59,7 +58,7 @@ export class Chain {
                 .toString('hex');
 
             // Compare broadhash instead of ID because ID is not always known
-            if (this._blocks.has(block.height) && this._blocks.get(block.height).broadhash != blockstamp.broadhash) {
+            if (this._blocks.has(block.height) && this._blocks.get(block.height)!.broadhash != blockstamp.broadhash) {
                 return false;
             } else {
                 this._blocks.set(block.height, blockstamp);
@@ -88,7 +87,7 @@ export class Chain {
             this._blocks.set(status.height, block);
         }
 
-        return this._blocks.get(status.height).broadhash === status.broadhash;
+        return this._blocks.get(status.height)!.broadhash === status.broadhash;
     }
 
     /***
@@ -96,7 +95,11 @@ export class Chain {
      * @returns {number}
      */
     public getBestHeight(): number {
-        return _.max(Array.from(this._blocks.keys()))
+        if (this._blocks.size == 0) {
+            return 0;
+        } else {
+            return Math.max(...this._blocks.keys());
+        }
     }
 }
 

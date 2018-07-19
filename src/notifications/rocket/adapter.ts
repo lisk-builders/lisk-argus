@@ -51,6 +51,7 @@ export class RocketChatAdapter implements NotificationAdapter {
 
     handleMissedBlock(delegate: Delegate): void {
         if (delegate.status == DelegateStatus.AWAITING_MISSED_MORE || delegate.status == DelegateStatus.MISSED_MORE) return;
+        if (!delegate.details) return;
         if (this.notificationBlacklist.has(delegate.details.username)) return;
 
         this.sendMessage(this.defaultChannel,
@@ -82,6 +83,7 @@ export class RocketChatAdapter implements NotificationAdapter {
     }
 
     handleDelegateStatusChanged(delegate: Delegate, oldStatus: DelegateStatus, newStatus: DelegateStatus): void {
+        if (!delegate.details) return;
         if (newStatus === DelegateStatus.FORGED_THIS_ROUND && oldStatus === DelegateStatus.AWAITING_MISSED_MORE) {
             this.sendMessage(this.defaultChannel,
                 ':green_heart: *Forging resumed* :green_heart: \n' +
