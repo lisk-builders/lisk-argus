@@ -1,14 +1,14 @@
 {
   "name": "lisk_argus",
   "version": "1.0.0",
-  "description": "",
+  "description": "A smart monitor for the Lisk network",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node src/main.js 5001"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Hendrik Hofstadt & Lisk Builders",
+  "license": "MIT",
   "dependencies": {
     "async": "^2.6.0",
     "express": "latest",
