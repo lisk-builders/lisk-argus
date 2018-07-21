@@ -22,7 +22,6 @@ export class LiskPeer extends events.EventEmitter {
 
     constructor(readonly _options: PeerOptions, readonly ownNonce: string) {
         super();
-        this._state = PeerState.OFFLINE;
 
         this.client = new LiskClient(_options.ip, _options.wsPort, _options.httpPort, {
             nonce: ownNonce,
