@@ -93,7 +93,7 @@ export class BlockchainManager extends EventEmitter {
                 if (this._peerChainMap.has(peer.status.nonce)) {
                     // Forked from an existing chain
                     let oldChain = _.find(this._chains, (chain) => {
-                        return chain.id == this._peerChainMap.get(peer.status.nonce);
+                        return peer.status && chain.id == this._peerChainMap.get(peer.status.nonce);
                     });
                     if (!oldChain) {
                         throw new Error("Did not find old chain");
@@ -151,7 +151,7 @@ export class BlockchainManager extends EventEmitter {
             } else if (this._peerChainMap.get(peer.status.nonce) != peerChain.id) {
                 // Moved to another chain
                 let oldChain = _.find(this._chains, (chain) => {
-                    return chain.id == this._peerChainMap.get(peer.status.nonce);
+                    return peer.status && chain.id == this._peerChainMap.get(peer.status.nonce);
                 });
                 if (!oldChain) {
                     throw new Error("Did not find old chain");

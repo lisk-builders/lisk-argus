@@ -50,9 +50,9 @@ export class LiskPeer extends events.EventEmitter {
         return this._state;
     }
 
-    private _status: NodeStatus;
+    private _status: NodeStatus | undefined;
 
-    get status(): NodeStatus {
+    get status(): NodeStatus | undefined {
         return this._status;
     }
 
@@ -78,7 +78,7 @@ export class LiskPeer extends events.EventEmitter {
      * @param {NodeStatus} status
      */
     public handleStatusUpdate(status: NodeStatus) {
-        if (!this.status || status.height > this._status.height) {
+        if (!this._status || status.height > this._status.height) {
             this._lastHeightUpdate = Date.now();
             this._stuck = false;
         } else if (!this._stuck && Date.now() - this._lastHeightUpdate > 20000) {
