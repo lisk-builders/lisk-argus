@@ -15,9 +15,9 @@ export enum LiskPeerEvent {
  */
 export class LiskPeer extends events.EventEmitter {
     public client: LiskClient;
-    public peers: PeerInfo[];
+    public peers: PeerInfo[] = [];
     public knownBy: number = 0;
-    private _lastHeightUpdate: number;
+    private _lastHeightUpdate: number = 0;
     private _stuck: boolean = false;
 
     constructor(readonly _options: PeerOptions, readonly ownNonce: string) {
