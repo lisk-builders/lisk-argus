@@ -20,7 +20,6 @@
     "rxjs": "^5.5.10",
     "sc-framework-health-check": "latest",
     "semver": "^5.5.0",
-    "serve-static": "latest",
     "socketcluster": "=11.4.1",
     "socketcluster-client": "^11.0.0",
     "telegraf": "^3.21.2",
@@ -32,7 +31,6 @@
     "@types/request": "^2.47.0",
     "@types/request-promise-native": "latest",
     "@types/semver": "^5.5.0",
-    "@types/serve-static": "^1.13.1",
     "@types/underscore": "^1.8.8",
     "@types/winston": "^2.3.9",
     "typescript": "^2.9.0"
