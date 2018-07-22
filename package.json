@@ -11,14 +11,8 @@
   "author": "Hendrik Hofstadt & Lisk Builders",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.0",
-    "express": "latest",
     "lowdb": "^1.0.0",
-    "morgan": "latest",
-    "request": "^2.85.0",
     "request-promise-native": "latest",
-    "rxjs": "^5.5.10",
-    "sc-framework-health-check": "latest",
     "semver": "^5.5.0",
     "socketcluster": "=11.4.1",
     "socketcluster-client": "^11.0.0",
@@ -27,8 +21,6 @@
     "winston": "^2.4.1"
   },
   "devDependencies": {
-    "@types/async": "^2.0.49",
-    "@types/request": "^2.47.0",
     "@types/request-promise-native": "latest",
     "@types/semver": "^5.5.0",
     "@types/underscore": "^1.8.8",
