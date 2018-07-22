@@ -33,13 +33,13 @@ export class LiskClient {
         this.options.query = query;
     }
 
-    public connect(connectHandler, disconnectHandler, errorHandler) {
+    public connect(connectHandler: () => void, closeHandler: () => void, errorHandler: (error: any) => void) {
         // Initiate the connection to the server
         this.socket = socketCluster.create(this.options);
         WAMPClient.registerWAMP(this.socket);
 
         this.socket.on('connect', connectHandler);
-        this.socket.on('close', disconnectHandler);
+        this.socket.on('close', closeHandler);
         this.socket.on('error', errorHandler);
     }
 
