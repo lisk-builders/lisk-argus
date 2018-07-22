@@ -93,8 +93,11 @@ export class BlockchainManager extends EventEmitter {
                 if (this._peerChainMap.has(peer.status.nonce)) {
                     // Forked from an existing chain
                     let oldChain = _.find(this._chains, (chain) => {
-                        return chain.id == this._peerChainMap.get(peer.status.nonce);
+                        return peer.status && chain.id == this._peerChainMap.get(peer.status.nonce);
                     });
+                    if (!oldChain) {
+                        throw new Error("Did not find old chain");
+                    }
 
                     let newChain = new Chain(...oldChain.blocks.slice(0, oldChain.blocks.length - 1));
                     // Push the new block to the chain
@@ -110,7 +113,7 @@ export class BlockchainManager extends EventEmitter {
                         nonce: peer.options.nonce,
                         peerHeight: peer.status.height,
                         peerBroadhash: peer.status.broadhash,
-                        oldChainBroadhash: oldChain.blocksMap.get(oldChain.getBestHeight()).broadhash,
+                        oldChainBroadhash: oldChain.blocksMap.get(oldChain.getBestHeight())!.broadhash,
                         chainHeight: oldChain.getBestHeight(),
                         newChain: newChain.id,
                         oldChain: oldChain.id,
@@ -148,8 +151,11 @@ export class BlockchainManager extends EventEmitter {
             } else if (this._peerChainMap.get(peer.status.nonce) != peerChain.id) {
                 // Moved to another chain
                 let oldChain = _.find(this._chains, (chain) => {
-                    return chain.id == this._peerChainMap.get(peer.status.nonce);
+                    return peer.status && chain.id == this._peerChainMap.get(peer.status.nonce);
                 });
+                if (!oldChain) {
+                    throw new Error("Did not find old chain");
+                }
                 this._peerChainMap.set(peer.status.nonce, peerChain.id);
                 this.emit('CHAIN_CHANGED', peer);
                 log.debug('CHAIN_CHANGED', {

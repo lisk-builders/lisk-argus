@@ -15,14 +15,13 @@ export enum LiskPeerEvent {
  */
 export class LiskPeer extends events.EventEmitter {
     public client: LiskClient;
-    public peers: PeerInfo[];
+    public peers: PeerInfo[] = [];
     public knownBy: number = 0;
-    private _lastHeightUpdate: number;
+    private _lastHeightUpdate: number = 0;
     private _stuck: boolean = false;
 
     constructor(readonly _options: PeerOptions, readonly ownNonce: string) {
         super();
-        this._state = PeerState.OFFLINE;
 
         this.client = new LiskClient(_options.ip, _options.wsPort, _options.httpPort, {
             nonce: ownNonce,
@@ -51,9 +50,9 @@ export class LiskPeer extends events.EventEmitter {
         return this._state;
     }
 
-    private _status: NodeStatus;
+    private _status: NodeStatus | undefined;
 
-    get status(): NodeStatus {
+    get status(): NodeStatus | undefined {
         return this._status;
     }
 
@@ -79,7 +78,7 @@ export class LiskPeer extends events.EventEmitter {
      * @param {NodeStatus} status
      */
     public handleStatusUpdate(status: NodeStatus) {
-        if (!this.status || status.height > this._status.height) {
+        if (!this._status || status.height > this._status.height) {
             this._lastHeightUpdate = Date.now();
             this._stuck = false;
         } else if (!this._stuck && Date.now() - this._lastHeightUpdate > 20000) {

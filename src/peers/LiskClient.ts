@@ -157,6 +157,7 @@ export interface WSPeerResponse {
 
 export interface PeerInfo {
     ip: string;
+    httpPort: number;
     wsPort: number;
     nonce: string;
     version: string;
@@ -165,7 +166,6 @@ export interface PeerInfo {
     broadhash?: string;
     height?: number;
     updated?: any;
-    httpPort?: number;
 }
 
 export interface Block {

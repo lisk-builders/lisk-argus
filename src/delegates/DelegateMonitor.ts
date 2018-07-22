@@ -17,7 +17,7 @@ export class DelegateMonitor extends events.EventEmitter {
     private blocks: Map<Number, Block> = new Map<Number, Block>();
     private delegates: Map<String, Delegate> = new Map<String, Delegate>();
     private nextForgers: ForgerDetail[] = [];
-    private lastForger: Delegate;
+    private lastForger: Delegate | undefined;
     private currentSlot: number;
 
     /***
@@ -99,10 +99,10 @@ export class DelegateMonitor extends events.EventEmitter {
         // We grant the network a 1 slot period for the block to spread otherwise it is probably missed
         if (this.currentSlot < slotDetails.currentSlot) {
             const bestHeight = _.max(Array.from(this.blocks.keys())) as number;
-            if (this.lastForger != null &&
-                this.blocks.get(bestHeight).generatorPublicKey !== this.lastForger.details.account.publicKey &&
-                this.blocks.get(bestHeight - 1).generatorPublicKey !== this.lastForger.details.account.publicKey &&
-                this.blocks.get(bestHeight - 2).generatorPublicKey !== this.lastForger.details.account.publicKey) {
+            if (this.lastForger && this.lastForger.details &&
+                this.blocks.get(bestHeight)!.generatorPublicKey !== this.lastForger.details.account.publicKey &&
+                this.blocks.get(bestHeight - 1)!.generatorPublicKey !== this.lastForger.details.account.publicKey &&
+                this.blocks.get(bestHeight - 2)!.generatorPublicKey !== this.lastForger.details.account.publicKey) {
                 this.emit(DelegateMonitor.EVENT_DELEGATE_BLOCK_MISSED, this.lastForger);
             }
 
@@ -112,9 +112,10 @@ export class DelegateMonitor extends events.EventEmitter {
         this.nextForgers = forgers;
         let roundDelegates = getRoundDelegates(this.nextForgers, this.peerManager.getBestHeight());
         for (let forger of forgers) {
-            if (!this.delegates.has(forger.publicKey)) continue;
-            this.delegates.get(forger.publicKey).nextSlot = forger.nextSlot;
-            this.delegates.get(forger.publicKey).isRoundDelegate = (roundDelegates.filter((item) => {
+            const delegate = this.delegates.get(forger.publicKey);
+            if (!delegate) continue;
+            delegate.nextSlot = forger.nextSlot;
+            delegate.isRoundDelegate = (roundDelegates.filter((item) => {
                 return forger.publicKey == item.publicKey;
             }).length != 0);
         }
@@ -142,13 +143,14 @@ export class DelegateMonitor extends events.EventEmitter {
 
             this.blocks.set(block.height, block);
 
-            if (this.delegates.has(block.generatorPublicKey) && (!this.delegates.get(block.generatorPublicKey).lastBlock || this.delegates.get(block.generatorPublicKey).lastBlock.height < block.height)) {
-                this.delegates.get(block.generatorPublicKey).lastBlock = block;
+            const delegate = this.delegates.get(block.generatorPublicKey);
+            if (delegate && (!delegate.lastBlock || delegate.lastBlock.height < block.height)) {
+                delegate.lastBlock = block;
             }
         }
 
         for (let delegate of this.delegates.values()) {
-            if (delegate.details.producedBlocks > 0 && !delegate.lastBlock) {
+            if (delegate.details && delegate.details.producedBlocks > 0 && !delegate.lastBlock) {
                 delegate.lastBlock = await this.peerManager.getBestHTTPPeer().client.getLastBlockByDelegateHTTP(delegate.details.account.publicKey);
             }
         }
@@ -177,28 +179,30 @@ export class DelegateMonitor extends events.EventEmitter {
         let droppedDelegates = _.difference(Array.from(this.delegates.keys()), Array.from(delegateMap.keys()));
 
         // Handle rank updates
-        for (let [key, delegate] of delegateMap) {
-            if (this.delegates.get(delegate.account.publicKey) && this.delegates.get(delegate.account.publicKey).details) {
-                if (this.delegates.get(delegate.account.publicKey).details.rank != delegate.rank) {
-                    this.handleDelegateRankChanged(delegate, delegate.rank - this.delegates.get(delegate.account.publicKey).details.rank)
+        for (let [key, delegateDetails] of delegateMap) {
+            const delegate = this.delegates.get(delegateDetails.account.publicKey);
+            if (delegate && delegate.details) {
+                if (delegate.details.rank != delegateDetails.rank) {
+                    this.handleDelegateRankChanged(delegateDetails, delegateDetails.rank - delegate.details.rank)
                 }
             }
         }
 
         // Handle new delegates in 101
         for (let key of newDelegates) {
-            this.handleNewDelegate(delegateMap.get(key));
+            this.handleNewDelegate(delegateMap.get(key)!);
         }
 
         // Handle dropped delegates from 101
         for (let key of droppedDelegates) {
-            this.handleDroppedDelegate(this.delegates.get(key).details);
+            this.handleDroppedDelegate(this.delegates.get(key)!.details!);
         }
 
         // Update details
-        for (let [key, delegate] of delegateMap) {
-            if (this.delegates.get(delegate.account.publicKey)) {
-                this.delegates.get(delegate.account.publicKey).details = delegate;
+        for (let [key, delegateDetails] of delegateMap) {
+            const delegate = this.delegates.get(delegateDetails.account.publicKey);
+            if (delegate) {
+                delegate.details = delegateDetails;
             }
         }
     }
@@ -239,14 +243,14 @@ export class Delegate {
     lastBlock: Block;
     nextSlot: Number;
     isRoundDelegate: Boolean;
-    public details: DelegateDetails;
+    public details: DelegateDetails | undefined;
 
     /***
      * Updates the current forging status of a delegate
      * @param {number} height current network height
-     * @returns {Promise<void>}
+     * @returns {void}
      */
-    public update(height: number): Promise<void> {
+    public update(height: number): void {
         if (!this.details) return;
 
         const networkRound = getRound(height);

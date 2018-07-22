@@ -95,7 +95,7 @@ export class PeerManager {
         }
 
         // Discover new peers
-        let newPeers = [];
+        let newPeers: PeerInfo[] = [];
         for (let peer of peerList) {
             if (_.find(Array.from(this._peers.values()), (item) => {
                 return item.options.nonce === peer.nonce
@@ -157,9 +157,10 @@ export class PeerManager {
      */
     public handleStatusUpdate(update) {
         if (!update.nonce) return;
-        if (!this._peers.has(update.nonce)) return;
 
-        this._peers.get(update.nonce).handleStatusUpdate(update);
+        const peer = this._peers.get(update.nonce);
+        if (!peer) return;
+        peer.handleStatusUpdate(update);
     }
 
     /***
@@ -169,7 +170,10 @@ export class PeerManager {
      */
     private wsServerConnectionChanged(nonce: string, connected: boolean) {
         if (!this._peers.has(nonce)) return;
-        this._peers.get(nonce).setWebsocketServerConnected(connected);
+
+        const peer = this._peers.get(nonce);
+        if (!peer) return;
+        peer.setWebsocketServerConnected(connected);
     }
 
 }

@@ -67,6 +67,7 @@ export class TelegramAdapter implements NotificationAdapter {
         if (!recipients) return;
 
         recipients.forEach((recipient) => {
+            if (!delegate.details) return;
             this.bot.telegram.sendMessage(recipient.id, '🚨 *Missed Block* 🚨 \n' +
                 'Delegate: `' + delegate.details.username + '` \n' +
                 'Number of missed blocks: `' + (delegate.details.missedBlocks + 1) + '` \n' +
@@ -112,11 +113,13 @@ export class TelegramAdapter implements NotificationAdapter {
     }
 
     handleDelegateStatusChanged(delegate: Delegate, oldStatus: DelegateStatus, newStatus: DelegateStatus): void {
+        if (!delegate.details) return;
         const recipients = this.db.get('delegates').filter({name: delegate.details.username}).value();
         if (!recipients) return;
 
         if (newStatus === DelegateStatus.FORGED_THIS_ROUND && oldStatus === DelegateStatus.AWAITING_MISSED_MORE) {
             recipients.forEach((recipient) => {
+                if (!delegate.details) return;
                 this.bot.telegram.sendMessage(recipient.id, '💚 *Forging resumed* 💚 \n' +
                     'Delegate `' + delegate.details.username + '` is now forging again \n' +
                     'Network: `' + this.network + '`', {parse_mode: 'markdown'});
@@ -124,6 +127,7 @@ export class TelegramAdapter implements NotificationAdapter {
         }
         else if (newStatus === DelegateStatus.MISSED_MORE && oldStatus === DelegateStatus.AWAITING_MISSED_LAST) {
             recipients.forEach((recipient) => {
+                if (!delegate.details) return;
                 this.bot.telegram.sendMessage(recipient.id, '🔴 *Forging stopped* 🔴 \n' +
                     'Delegate `' + delegate.details.username + '` has missed more than 1 block and is :red_circle: now \n' +
                     'Network: `' + this.network + '`', {parse_mode: 'markdown'});
