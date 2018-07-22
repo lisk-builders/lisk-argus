@@ -9,12 +9,15 @@ export class WAMPClient {
     public static registerWAMP(socket): void {
         socket.call = (procedure, data) => new Promise((resolve, reject) => {
             socket.emit('rpc-request', {type: '/RPCRequest', procedure, data}, (err, result) => {
-                if (result) {
-                    resolve(result.data);
-                } else if (err) {
-                    reject(err)
+                if (err) {
+                    reject(err);
+                } else {
+                    if (result) {
+                        resolve(result.data);
+                    } else  {
+                        resolve();
+                    }
                 }
-                resolve();
             });
         })
     }
