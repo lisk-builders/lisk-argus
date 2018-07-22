@@ -38,7 +38,10 @@ export class LiskPeer extends events.EventEmitter {
         });
 
         // Connect via WebSocket
-        this.client.connect(() => this.onClientConnect(), () => this.onClientDisconnect(), () => this.onClientError());
+        this.client.connect(
+          () => this.onClientConnect(),
+          () => this.onClientDisconnect(),
+          (error) => this.onClientError(error));
 
         // Schedule status updates
         setInterval(() => this.updateStatus(), 2000)
@@ -134,8 +137,8 @@ export class LiskPeer extends events.EventEmitter {
         this._state = PeerState.OFFLINE;
     }
 
-    private onClientError() {
-
+    private onClientError(error: any) {
+      log.error(`connection error from ${this._options.ip}:${this._options.wsPort}: ${error}`);
     }
 
     /***
