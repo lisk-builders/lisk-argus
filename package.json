@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "lowdb": "^1.0.0",
-    "request-promise-native": "latest",
+    "request-promise-native": "^1.0.5",
     "semver": "^5.5.0",
     "socketcluster": "=11.4.1",
     "socketcluster-client": "^11.0.0",
