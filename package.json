@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/request": "^2.47.1",
-    "@types/request-promise-native": "latest",
+    "@types/request-promise-native": "^1.0.15",
     "@types/semver": "^5.5.0",
     "@types/underscore": "^1.8.8",
     "@types/winston": "^2.3.9",
