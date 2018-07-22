@@ -14,16 +14,6 @@ src/**/*.js
 **/test/coverage
 report
 
-
-# mongo db
-###################
-#Don't commit Mongo Database files
-*.lock
-*.0
-*.1
-*.ns
-journal
-
 # Ignore Web Storm #
 .idea
 
