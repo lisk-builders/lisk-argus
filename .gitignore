@@ -2,6 +2,9 @@
 ###################
 node_modules/
 
+# TypeScript compilation output
+build/
+
 # Ignore Test reporters
 ###################
 **/test/coverage
