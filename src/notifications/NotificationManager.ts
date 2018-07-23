@@ -5,7 +5,7 @@ import { DelegateDetails } from "../peers/LiskClient";
 import { RocketChatAdapter } from "./rocket/adapter";
 import { TelegramAdapter } from "./telegram/adapter";
 
-const config = require("../config.json");
+const config = require("../../src/config.json");
 
 export class NotificationManager {
   private adapters: NotificationAdapter[] = [];
