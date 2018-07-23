@@ -4,6 +4,7 @@
   "description": "A smart monitor for the Lisk network",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write './src/**/*.ts'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "yarn build && node src/main.js 5001"
@@ -12,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "lowdb": "^1.0.0",
+    "prettier": "^1.13.7",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
     "semver": "^5.5.0",
