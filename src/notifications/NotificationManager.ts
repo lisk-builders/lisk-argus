@@ -19,7 +19,7 @@ export class NotificationManager {
         delegateMonitor.on(DelegateMonitor.EVENT_DELEGATE_NEW_TOP, (delegate) => this.adapters.forEach((adapter) => adapter.handleDelegateNewTop(delegate)));
 
         if (config.notifications.riot.active) {
-            const riot = new RocketChatAdapter(config.notifications.riot.host, config.notifications.riot.username, config.notifications.riot.password, config.notifications.riot.defaultChannel, 'betanet');
+            const riot = new RocketChatAdapter(config.notifications.riot.host, config.notifications.riot.username, config.notifications.riot.password, config.notifications.riot.defaultChannel, config.notifications.riot.nameMappings, 'betanet');
             this.adapters.push(riot)
         }
 
