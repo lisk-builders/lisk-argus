@@ -1,13 +1,6 @@
-
-# Ignore Node & Bower
+# NPM
 ###################
-node_modules
-bower_components
-build
-.tmp
-package-lock.json
-src/**/*.map
-src/**/*.js
+node_modules/
 
 # Ignore Test reporters
 ###################
