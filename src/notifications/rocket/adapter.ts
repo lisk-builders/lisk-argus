@@ -65,25 +65,23 @@ export class RocketChatAdapter implements NotificationAdapter {
     this.sendMessage(
       this.defaultChannel,
       ":rotating_light: *Missed Block* :rotating_light: \n" +
-      "Delegate: `" +
-      this.hasNameMapping(delegate.details.username)
-        ? delegate.details.username
-        : delegate.details.username +
-          "/" +
-          this.replaceDelegateName(delegate.details.username) +
-          "` || " +
-          "Number of missed blocks: `" +
-          (delegate.details.missedBlocks + 1) +
-          "` || " +
-          "Last block: `" +
-          (delegate.lastBlock
-            ? RocketChatAdapter.timeSince(convertEpochToSeconds(delegate.lastBlock.timestamp)) +
-              " ago"
-            : "never") +
-          "`\n" +
-          "Network: `" +
-          this.network +
-          "`",
+        "Delegate: `" +
+        (this.hasNameMapping(delegate.details.username)
+          ? delegate.details.username + "/" + this.replaceDelegateName(delegate.details.username)
+          : delegate.details.username) +
+        "` || " +
+        "Number of missed blocks: `" +
+        (delegate.details.missedBlocks + 1) +
+        "` || " +
+        "Last block: `" +
+        (delegate.lastBlock
+          ? RocketChatAdapter.timeSince(convertEpochToSeconds(delegate.lastBlock.timestamp)) +
+            " ago"
+          : "never") +
+        "`\n" +
+        "Network: `" +
+        this.network +
+        "`",
     );
     this.notificationBlacklist.set(delegate.details.username, true);
   }
@@ -92,19 +90,17 @@ export class RocketChatAdapter implements NotificationAdapter {
     this.sendMessage(
       this.defaultChannel,
       ":wave_tone2: *Bye Bye* :wave_tone2: \n" +
-      "Delegate `" +
-      this.hasNameMapping(delegate.username)
-        ? delegate.username
-        : delegate.username +
-          "/" +
-          this.replaceDelegateName(delegate.username) +
-          "` just lost his forging position || " +
-          "Rank: `" +
-          delegate.rank +
-          "`\n" +
-          "Network: `" +
-          this.network +
-          "`",
+        "Delegate `" +
+        (this.hasNameMapping(delegate.username)
+          ? delegate.username + "/" + this.replaceDelegateName(delegate.username)
+          : delegate.username) +
+        "` just lost his forging position || " +
+        "Rank: `" +
+        delegate.rank +
+        "`\n" +
+        "Network: `" +
+        this.network +
+        "`",
     );
   }
 
@@ -112,19 +108,17 @@ export class RocketChatAdapter implements NotificationAdapter {
     this.sendMessage(
       this.defaultChannel,
       ":minions_hands: *Congratulations* :minions_hands:  \n" +
-      "Delegate `" +
-      this.hasNameMapping(delegate.username)
-        ? delegate.username
-        : delegate.username +
-          "/" +
-          this.replaceDelegateName(delegate.username) +
-          "` was elevated into a forging position || " +
-          "Rank: `" +
-          delegate.rank +
-          "`\n" +
-          "Network: `" +
-          this.network +
-          "`",
+        "Delegate `" +
+        (this.hasNameMapping(delegate.username)
+          ? delegate.username + "/" + this.replaceDelegateName(delegate.username)
+          : delegate.username) +
+        "` was elevated into a forging position || " +
+        "Rank: `" +
+        delegate.rank +
+        "`\n" +
+        "Network: `" +
+        this.network +
+        "`",
     );
   }
 
@@ -143,16 +137,14 @@ export class RocketChatAdapter implements NotificationAdapter {
       this.sendMessage(
         this.defaultChannel,
         ":green_heart: *Forging resumed* :green_heart: \n" +
-        "Delegate `" +
-        this.hasNameMapping(delegate.details.username)
-          ? delegate.details.username
-          : delegate.details.username +
-            "/" +
-            this.replaceDelegateName(delegate.details.username) +
-            "` is now forging again \n" +
-            "Network: `" +
-            this.network +
-            "`",
+          "Delegate `" +
+          (this.hasNameMapping(delegate.details.username)
+            ? delegate.details.username + "/" + this.replaceDelegateName(delegate.details.username)
+            : delegate.details.username) +
+          "` is now forging again \n" +
+          "Network: `" +
+          this.network +
+          "`",
       );
       this.notificationBlacklist.delete(delegate.details.username);
     } else if (
@@ -162,16 +154,14 @@ export class RocketChatAdapter implements NotificationAdapter {
       this.sendMessage(
         this.defaultChannel,
         ":red_circle: *Forging stopped* :red_circle: \n" +
-        "Delegate `" +
-        this.hasNameMapping(delegate.details.username)
-          ? delegate.details.username
-          : delegate.details.username +
-            "/" +
-            this.replaceDelegateName(delegate.details.username) +
-            "` has missed more than 1 block and is :red_circle: now \n" +
-            "Network: `" +
-            this.network +
-            "`",
+          "Delegate `" +
+          (this.hasNameMapping(delegate.details.username)
+            ? delegate.details.username + "/" + this.replaceDelegateName(delegate.details.username)
+            : delegate.details.username) +
+          "` has missed more than 1 block and is :red_circle: now \n" +
+          "Network: `" +
+          this.network +
+          "`",
       );
     }
   }
