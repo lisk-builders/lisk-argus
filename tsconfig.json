@@ -3,6 +3,7 @@
     "strictNullChecks": true,
     "target": "es2015",
     "module": "commonjs",
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "build",
   }
 }

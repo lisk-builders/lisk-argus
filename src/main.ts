@@ -5,7 +5,7 @@ import { BlockchainManager } from "./blocks/BlockchainManager";
 import * as crypto from "crypto";
 import { NotificationManager } from "./notifications/NotificationManager";
 
-const config = require("./config.json");
+const config = require("../src/config.json");
 
 const nonce =
   "monitoring_" +

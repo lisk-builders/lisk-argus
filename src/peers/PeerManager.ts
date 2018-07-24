@@ -5,7 +5,7 @@ import * as semver from "semver";
 import { SocketServer } from "../websockets/SocketServer";
 import { PeerInfo } from "./LiskClient";
 
-const config = require("../config.json");
+const config = require("../../src/config.json");
 
 /***
  * PeerManager keeps track of connected peers.
