@@ -10,7 +10,7 @@ import { HttpApi } from "../lib/HttpApi";
 export class LiskClient {
   socket: any;
   public peers;
-  public readonly http: HttpApi
+  public readonly http: HttpApi;
 
   public options = {
     hostname: "betanet.lisk.io",
