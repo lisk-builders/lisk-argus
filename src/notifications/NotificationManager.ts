@@ -1,7 +1,7 @@
 import { Delegate, DelegateMonitor, DelegateStatus } from "../delegates/DelegateMonitor";
 import { BlockchainManager } from "../blocks/BlockchainManager";
 import { PeerManager } from "../peers/PeerManager";
-import { DelegateDetails } from "../peers/LiskClient";
+import { DelegateDetails } from "../lib/HttpApi";
 import { RocketChatAdapter } from "./rocket/adapter";
 import { TelegramAdapter } from "./telegram/adapter";
 

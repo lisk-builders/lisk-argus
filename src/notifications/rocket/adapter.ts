@@ -2,7 +2,7 @@ import { Delegate, DelegateStatus } from "../../delegates/DelegateMonitor";
 import { convertEpochToSeconds } from "../../utils/generic";
 import { NotificationAdapter } from "../NotificationManager";
 import * as request from "request-promise-native";
-import { DelegateDetails } from "../../peers/LiskClient";
+import { DelegateDetails } from "../../lib/HttpApi";
 
 export class RocketChatAdapter implements NotificationAdapter {
   private authSession;

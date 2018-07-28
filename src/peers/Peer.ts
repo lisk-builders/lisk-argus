@@ -34,8 +34,8 @@ export class LiskPeer extends events.EventEmitter {
     });
 
     // Check whether client supports HTTP
-    this.client
-      .getStatusDetailedHTTP()
+    this.client.http
+      .getNodeStatus()
       .then(() => (this._httpActive = true))
       .catch(() => {});
 
