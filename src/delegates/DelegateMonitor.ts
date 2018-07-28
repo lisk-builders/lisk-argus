@@ -98,7 +98,7 @@ export class DelegateMonitor extends events.EventEmitter {
     return this.peerManager
       .getBestHTTPPeer()
       .client.getForgersHTTP()
-      .then(data => this.processForgers(data.data, data.meta));
+      .then(response => this.processForgers(response.data, response.meta));
   }
 
   /***
