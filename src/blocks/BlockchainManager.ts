@@ -47,9 +47,9 @@ export class BlockchainManager extends EventEmitter {
     let chain = new Chain();
 
     return new Promise((resolve, reject) => {
-      peer.client
-        .getBlocksHTTP()
-        .then(blocks => chain.updateBlocks(blocks))
+      peer.client.http
+        .getBlocks()
+        .then(response => chain.updateBlocks(response.data))
         .then(onChain => {
           this._chains.push(chain);
           resolve();

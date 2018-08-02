@@ -1,6 +1,7 @@
 import * as socketCluster from "socketcluster-client";
-import * as request from "request-promise-native";
+
 import { WAMPClient } from "../websockets/wamp/WAMPClient";
+import { HttpApi } from "../lib/HttpApi";
 
 /***
  * LiskClient is a client for the Lisk Core Websocket and HTTP protocol.
@@ -9,6 +10,7 @@ import { WAMPClient } from "../websockets/wamp/WAMPClient";
 export class LiskClient {
   socket: any;
   public peers;
+  public readonly http: HttpApi;
 
   public options = {
     hostname: "betanet.lisk.io",
@@ -31,6 +33,7 @@ export class LiskClient {
     this.options.port = wsPort || 5001;
     this.options.httpPort = httpPort || 5000;
     this.options.query = query;
+    this.http = new HttpApi(this.options.hostname, this.options.httpPort);
   }
 
   public connect(
@@ -61,52 +64,6 @@ export class LiskClient {
 
   public getBlocks(lasBlockID?: string): Promise<WSBlockResponse> {
     return this.socket.call("blocks", { lastId: lasBlockID || "" });
-  }
-
-  public getStatusDetailedHTTP(): Promise<NodeStatusExtended> {
-    return request(`http://${this.options.hostname}:${this.options.httpPort}/api/node/status`, {
-      json: true,
-    }).then(data => data.data);
-  }
-
-  public getBlocksHTTP(): Promise<Array<Block>> {
-    return request(
-      `http://${this.options.hostname}:${this.options.httpPort}/api/blocks?limit=100`,
-      { json: true },
-    ).then(data => data.data);
-  }
-
-  public getForgersHTTP(): Promise<ForgerResponse> {
-    return request(
-      `http://${this.options.hostname}:${this.options.httpPort}/api/delegates/forgers?limit=100`,
-      { json: true },
-    ).then(data => data);
-  }
-
-  public getDelegatesHTTP(): Promise<Array<DelegateDetails>> {
-    return request(
-      `http://${this.options.hostname}:${
-        this.options.httpPort
-      }/api/delegates?limit=101&sort=rank:asc`,
-      { json: true },
-    ).then(data => data.data);
-  }
-
-  public getLastBlockByDelegateHTTP(generatorKey: string): Promise<Block> {
-    return request(
-      `http://${this.options.hostname}:${
-        this.options.httpPort
-      }/api/blocks?limit=1&generatorPublicKey=${generatorKey}`,
-      { json: true },
-    ).then(data => data.data[0]);
-  }
-
-  public getBlockByHeight(height: number): Promise<Block> {
-    return request(
-      `http://${this.options.hostname}:${
-        this.options.httpPort
-      }/api/blocks?limit=1&height=${height}`,
-    ).then(data => data.data[0]);
   }
 }
 
@@ -187,78 +144,3 @@ export interface PeerInfo {
   height?: number;
   updated?: any;
 }
-
-export interface Block {
-  id: string;
-  version: number;
-  timestamp: number;
-  height: number;
-  numberOfTransactions: number;
-  totalAmount: string;
-  totalFee: string;
-  reward: string;
-  payloadLength: number;
-  payloadHash: string;
-  generatorPublicKey: string;
-  blockSignature: string;
-  confirmations: number;
-  totalForged: string;
-  generatorAddress: string;
-  previousBlockId: string;
-}
-
-export interface NodeStatusExtended {
-  broadhash: string;
-  consensus: number;
-  height: number;
-  loaded: boolean;
-  networkHeight: number;
-  syncing: boolean;
-  transactions: TransactionsStats;
-}
-
-export interface TransactionsStats {
-  confirmed: number;
-  unconfirmed: number;
-  unprocessed: number;
-  unsigned: number;
-  total: number;
-}
-
-export interface ForgerResponse {
-  meta: ForgerMeta;
-  data: ForgerDetail[];
-}
-
-export interface ForgerMeta {
-  lastBlock: number;
-  lastBlockSlot: number;
-  currentSlot: number;
-  limit: number;
-  offset: number;
-}
-
-export interface ForgerDetail {
-  publicKey: string;
-  username: string;
-  address: string;
-  nextSlot: number;
-}
-
-export type Account = {
-  address: string;
-  publicKey: string;
-  secondPublicKey: string;
-};
-
-export type DelegateDetails = {
-  rewards: string;
-  vote: string;
-  producedBlocks: number;
-  missedBlocks: number;
-  username: string;
-  rank: number;
-  approval: number;
-  productivity: number;
-  account: Account;
-};

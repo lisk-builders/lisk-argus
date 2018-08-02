@@ -2,7 +2,7 @@ import { PeerManager } from "../peers/PeerManager";
 import * as events from "events";
 import * as _ from "underscore";
 import * as log from "winston";
-import { Block, DelegateDetails, ForgerDetail, ForgerMeta } from "../peers/LiskClient";
+import { Block, DelegateDetails, ForgerDetail, ForgerMeta } from "../lib/HttpApi";
 
 /***
  * The DelegateMonitor keeps track of the delegate ranks and forging status of delegates on a Lisk chain
@@ -97,8 +97,8 @@ export class DelegateMonitor extends events.EventEmitter {
   private updateForgers(): Promise<void> {
     return this.peerManager
       .getBestHTTPPeer()
-      .client.getForgersHTTP()
-      .then(data => this.processForgers(data.data, data.meta));
+      .client.http.getForgers()
+      .then(response => this.processForgers(response.data, response.meta));
   }
 
   /***
@@ -149,8 +149,8 @@ export class DelegateMonitor extends events.EventEmitter {
   private updateBlocks(): Promise<void> {
     return this.peerManager
       .getBestHTTPPeer()
-      .client.getBlocksHTTP()
-      .then(blocks => this.processBlocks(blocks));
+      .client.http.getBlocks()
+      .then(response => this.processBlocks(response.data));
   }
 
   /***
@@ -174,7 +174,7 @@ export class DelegateMonitor extends events.EventEmitter {
       if (delegate.details && delegate.details.producedBlocks > 0 && !delegate.lastBlock) {
         delegate.lastBlock = await this.peerManager
           .getBestHTTPPeer()
-          .client.getLastBlockByDelegateHTTP(delegate.details.account.publicKey);
+          .client.http.getLastBlockByDelegate(delegate.details.account.publicKey);
       }
     }
   }
@@ -186,8 +186,8 @@ export class DelegateMonitor extends events.EventEmitter {
   private updateDelegates(): Promise<void> {
     return this.peerManager
       .getBestHTTPPeer()
-      .client.getDelegatesHTTP()
-      .then(data => this.processDelegates(data));
+      .client.http.getDelegates()
+      .then(response => this.processDelegates(response.data));
   }
 
   /***
