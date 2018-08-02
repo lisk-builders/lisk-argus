@@ -35,7 +35,7 @@ Update the config file ```config.json```. The default config file is configured 
 
 Run the monitor
 
-``npm start``
+`npm start` or `yarn start`
 
 ### Implement own notification adapters
 
