@@ -28,6 +28,6 @@ setTimeout(() => {
   const delegateMonitor = new DelegateMonitor(peerManager);
 
   delegateMonitor.start().then(() => {
-    const notifications = new NotificationManager(delegateMonitor, blockManager, peerManager);
+    const notifications = new NotificationManager(delegateMonitor);
   });
 }, 5000);

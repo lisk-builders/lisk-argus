@@ -1,6 +1,4 @@
 import { Delegate, DelegateMonitor, DelegateStatus } from "../delegates/DelegateMonitor";
-import { BlockchainManager } from "../blocks/BlockchainManager";
-import { PeerManager } from "../peers/PeerManager";
 import { DelegateDetails } from "../lib/HttpApi";
 import { RocketChatAdapter } from "./rocket/adapter";
 import { TelegramAdapter } from "./telegram/adapter";
@@ -10,11 +8,7 @@ const config = require("../../src/config.json");
 export class NotificationManager {
   private adapters: NotificationAdapter[] = [];
 
-  constructor(
-    readonly delegateMonitor: DelegateMonitor,
-    blockchainManager: BlockchainManager,
-    PeerManager: PeerManager,
-  ) {
+  constructor(delegateMonitor: DelegateMonitor) {
     delegateMonitor.on(DelegateMonitor.EVENT_DELEGATE_BLOCK_MISSED, delegate =>
       this.adapters.forEach(adapter => adapter.handleMissedBlock(delegate)),
     );
