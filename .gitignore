@@ -10,8 +10,9 @@ build/
 **/test/coverage
 report
 
-# Ignore Web Storm #
-.idea
+# IDEs
+.idea/
+.vscode/
 
 # Compiled source #
 ###################
