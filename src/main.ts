@@ -17,17 +17,19 @@ const nonce =
 const socketServer = new SocketServer(parseInt(process.argv[2]), nonce);
 const peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]), nonce);
 
+let blockManager: BlockchainManager | undefined;
+let delegateMonitor: DelegateMonitor | undefined;
+let notificationsManager: NotificationManager | undefined;
+
 //TODO give the peers time connect
-setTimeout(() => {
-  let blockManager;
+setTimeout(async () => {
   if (config.blockMonitor) {
     blockManager = new BlockchainManager(peerManager);
     blockManager.initalizeCache();
   }
 
-  const delegateMonitor = new DelegateMonitor(peerManager);
+  delegateMonitor = new DelegateMonitor(peerManager);
+  await delegateMonitor.start();
 
-  delegateMonitor.start().then(() => {
-    const notifications = new NotificationManager(delegateMonitor);
-  });
+  notificationsManager = new NotificationManager(delegateMonitor);
 }, 5000);
