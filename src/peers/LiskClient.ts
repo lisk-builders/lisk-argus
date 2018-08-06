@@ -8,8 +8,6 @@ import { HttpApi } from "../lib/HttpApi";
  * It maintains a Websocket connection and can call various HTTP endpoints.
  */
 export class LiskClient {
-  socket: any;
-  public peers;
   public readonly http: HttpApi;
 
   public options = {
@@ -27,6 +25,8 @@ export class LiskClient {
       initialDelay: 5000,
     },
   };
+
+  private socket: any;
 
   constructor(hostname, wsPort, httpPort, query) {
     this.options.hostname = hostname || "betanet.lisk.io";
