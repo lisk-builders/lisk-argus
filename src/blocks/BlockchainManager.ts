@@ -10,10 +10,10 @@ import * as log from "winston";
  * It detects potential forks and emits events related to the peer chain association on the network.
  */
 export class BlockchainManager extends EventEmitter {
-  _sync = false;
-  _chains: Chain[] = [];
-  _peerChainMap: Map<string, number> = new Map<string, number>();
-  _mainchain: string | undefined;
+  private _sync = false;
+  private _chains: Chain[] = [];
+  private _peerChainMap: Map<string, number> = new Map<string, number>();
+  private _mainchain: string | undefined;
 
   /***
    * Instantiates a BlockchainManager
