@@ -9,10 +9,10 @@ const FileSync = require("lowdb/adapters/FileSync");
 const Telegraf = require("telegraf");
 
 export class TelegramAdapter implements NotificationAdapter {
-  private bot;
-  private db;
+  private bot: any;
+  private db: any;
 
-  constructor(readonly botToken, readonly network) {
+  constructor(readonly botToken: string, readonly network: string) {
     this.bot = new Telegraf(botToken);
 
     const adapter = new FileSync("db.json");
@@ -25,7 +25,7 @@ export class TelegramAdapter implements NotificationAdapter {
   }
 
   setupListeners(): void {
-    this.bot.start(ctx =>
+    this.bot.start((ctx: any) =>
       ctx.replyWithMarkdown(
         "Hello fellow Lisker 👋!\n" +
           "My name is A.R.G.U.S. and I am here to notify you about events on the Lisk network.\n" +
@@ -36,7 +36,7 @@ export class TelegramAdapter implements NotificationAdapter {
       ),
     );
 
-    this.bot.command("delegate", ctx => {
+    this.bot.command("delegate", (ctx: any) => {
       if (ctx.message.text.split(" ").length != 2) {
         ctx.reply("Please use the command like this:\n /delegate followed by the delegate name");
       } else {
@@ -61,7 +61,7 @@ export class TelegramAdapter implements NotificationAdapter {
         }
       }
     });
-    this.bot.command("missedBlocks", ctx => {
+    this.bot.command("missedBlocks", (ctx: any) => {
       const dbEntry = this.db
         .get("missedBlocks")
         .find({ id: ctx.chat.id })
@@ -86,7 +86,7 @@ export class TelegramAdapter implements NotificationAdapter {
     const recipients = this.db.get("missedBlocks").value();
     if (!recipients) return;
 
-    recipients.forEach(recipient => {
+    recipients.forEach((recipient: any) => {
       if (!delegate.details) return;
       this.bot.telegram.sendMessage(
         recipient.id,
@@ -118,7 +118,7 @@ export class TelegramAdapter implements NotificationAdapter {
       .value();
     if (!recipients) return;
 
-    recipients.forEach(recipient => {
+    recipients.forEach((recipient: any) => {
       this.bot.telegram.sendMessage(
         recipient.id,
         "👋 *Bye Bye* 👋 \n" +
@@ -143,7 +143,7 @@ export class TelegramAdapter implements NotificationAdapter {
       .value();
     if (!recipients) return;
 
-    recipients.forEach(recipient => {
+    recipients.forEach((recipient: any) => {
       this.bot.telegram.sendMessage(
         recipient.id,
         "🎊 *Congratulations* 🎊 \n" +
@@ -168,7 +168,7 @@ export class TelegramAdapter implements NotificationAdapter {
       .value();
     if (!recipients) return;
 
-    recipients.forEach(recipient => {
+    recipients.forEach((recipient: any) => {
       this.bot.telegram.sendMessage(
         recipient.id,
         "*Rank change* \n" +
@@ -205,7 +205,7 @@ export class TelegramAdapter implements NotificationAdapter {
       newStatus === DelegateStatus.FORGED_THIS_ROUND &&
       oldStatus === DelegateStatus.AWAITING_MISSED_MORE
     ) {
-      recipients.forEach(recipient => {
+      recipients.forEach((recipient: any) => {
         if (!delegate.details) return;
         this.bot.telegram.sendMessage(
           recipient.id,
@@ -223,7 +223,7 @@ export class TelegramAdapter implements NotificationAdapter {
       newStatus === DelegateStatus.MISSED_MORE &&
       oldStatus === DelegateStatus.AWAITING_MISSED_LAST
     ) {
-      recipients.forEach(recipient => {
+      recipients.forEach((recipient: any) => {
         if (!delegate.details) return;
         this.bot.telegram.sendMessage(
           recipient.id,

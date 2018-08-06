@@ -13,7 +13,7 @@ export class BlockchainManager extends EventEmitter {
   _sync = false;
   _chains: Chain[] = [];
   _peerChainMap: Map<string, number> = new Map<string, number>();
-  _mainchain: string = "";
+  _mainchain: string | undefined;
 
   /***
    * Instantiates a BlockchainManager
@@ -183,7 +183,7 @@ export class BlockchainManager extends EventEmitter {
   private determineMainchain(): void {
     const chainStats = _.countBy(Array.from(this._peerChainMap.values()), chainID => chainID);
     let bestPeerNumber = 0;
-    let bestChain;
+    let bestChain: string | undefined;
 
     for (let chainID in chainStats) {
       const peerNumber = chainStats[chainID];

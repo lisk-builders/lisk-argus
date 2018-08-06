@@ -6,16 +6,16 @@ export class WAMPServer {
    * Upgrades the socket to a WAMP capable socket
    * @param socket
    */
-  public static registerWAMP(socket): void {
-    socket.on("rpc-request", (req, res) => {
+  public static registerWAMP(socket: any): void {
+    socket.on("rpc-request", (req: any, res: any) => {
       this.processWampRequest(socket, req, res);
     });
     socket.endpoints = { rpc: {} };
   }
 
-  private static processWampRequest(socket, req, res): void {
+  private static processWampRequest(socket: any, req: any, res: any): void {
     if (socket.endpoints.rpc[req.procedure]) {
-      socket.endpoints.rpc[req.procedure](req.data, (err, data) => {
+      socket.endpoints.rpc[req.procedure](req.data, (err: any, data: any) => {
         res(err, {
           type: "/RPCResponse",
           data: data,
@@ -36,7 +36,7 @@ export class WAMPServer {
    * @param socket
    * @param endpoints
    */
-  public static registerRPCEndpoints(socket, endpoints): void {
+  public static registerRPCEndpoints(socket: any, endpoints: any): void {
     socket.endpoints.rpc = Object.assign(socket.endpoints.rpc, endpoints);
   }
 }

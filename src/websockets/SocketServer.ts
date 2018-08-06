@@ -32,14 +32,14 @@ export class SocketServer extends EventEmitter {
       rebootWorkerOnCrash: true,
     });
 
-    socketCluster.on("workerMessage", (id, msg) => {
+    socketCluster.on("workerMessage", (id: any, msg: any) => {
       if (msg.event === "request_nonce") return socketCluster.sendToWorker(id, nonce);
       this.emit(msg.event, msg.data);
     });
 
-    socketCluster.on("workerStart", (id, msg) => {});
+    socketCluster.on("workerStart", (id: any, msg: any) => {});
 
-    socketCluster.on("workerExit", (id, msg) => {
+    socketCluster.on("workerExit", (id: any, msg: any) => {
       console.log("worker died", id);
     });
   }

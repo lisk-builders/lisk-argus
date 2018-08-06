@@ -173,7 +173,7 @@ export class PeerManager {
    * @returns {LiskPeer}
    */
   public getBestHTTPPeer(): LiskPeer {
-    let bestPeer;
+    let bestPeer: LiskPeer | undefined;
     let bestHeight = 0;
 
     // Shuffle peers to guarantee that we use different ones every time
@@ -187,6 +187,11 @@ export class PeerManager {
         bestPeer = peer;
         bestHeight = peer.status ? peer.status.height : 0;
       }
+    }
+
+    if (!bestPeer) {
+      // TODO: undefined should be a valid result type for getBestHTTPPeer
+      throw new Error("No best peer found");
     }
 
     return bestPeer;
@@ -205,7 +210,7 @@ export class PeerManager {
    * This is invoked when an updateMyself message is sent by a Lisk node
    * @param update
    */
-  public handleStatusUpdate(update) {
+  public handleStatusUpdate(update: any) {
     if (!update.nonce) return;
 
     const peer = this._peers.get(update.nonce);

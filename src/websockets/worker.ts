@@ -7,16 +7,16 @@ const SCWorker = require("socketcluster/scworker");
  * Worker is a SocketCluster Worker that emulates basic Lisk Core behaviour and forwards status updates
  */
 class Worker extends SCWorker {
-  private nonce;
+  private nonce: string = "";
 
   rpcEndpoints = {
-    updateMyself: (data, cb) => {
+    updateMyself: (data: any, cb: any) => {
       this.sendToMaster({ event: "status", data: data });
       cb(null, {
         success: true,
       });
     },
-    status: (data, cb) => {
+    status: (data: any, cb: any) => {
       cb(null, {
         success: true,
         height: 0,
@@ -30,7 +30,7 @@ class Worker extends SCWorker {
   };
 
   run() {
-    this.scServer.on("connection", socket => {
+    this.scServer.on("connection", (socket: any) => {
       WAMPServer.registerWAMP(socket);
       WAMPServer.registerRPCEndpoints(socket, this.rpcEndpoints);
 
@@ -42,7 +42,7 @@ class Worker extends SCWorker {
       });
     });
 
-    this.on("masterMessage", data => {
+    this.on("masterMessage", (data: any) => {
       this.nonce = data;
     });
 

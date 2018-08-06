@@ -35,9 +35,7 @@ export class DelegateMonitor extends events.EventEmitter {
    */
   public start(): Promise<void> {
     // Start update ticks
-    let updateFunction;
-
-    updateFunction = () => {
+    const updateFunction = () => {
       this.update()
         .then(() => {
           setTimeout(updateFunction, 2000);
@@ -328,7 +326,7 @@ export class Delegate {
  * @param height network block height
  * @returns {number} round a that height
  */
-function getRound(height): number {
+function getRound(height: number): number {
   return Math.ceil(height / 101);
 }
 

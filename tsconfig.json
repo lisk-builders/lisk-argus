@@ -1,9 +1,14 @@
 {
   "compilerOptions": {
     "strictNullChecks": true,
+    "noImplicitAny": true,
     "target": "es2015",
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "build",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./custom_types"
+    ],
   }
 }

@@ -5,17 +5,17 @@ import * as request from "request-promise-native";
 import { DelegateDetails } from "../../lib/HttpApi";
 
 export class RocketChatAdapter implements NotificationAdapter {
-  private authSession;
+  private authSession: any;
 
   private notificationBlacklist: Map<string, boolean> = new Map<string, boolean>();
 
   constructor(
-    readonly host,
-    readonly username,
-    readonly password,
-    readonly defaultChannel,
-    readonly nameMappings,
-    readonly network,
+    readonly host: string,
+    readonly username: string,
+    readonly password: string,
+    readonly defaultChannel: string,
+    readonly nameMappings: any,
+    readonly network: string,
   ) {
     this.authenticate();
   }
