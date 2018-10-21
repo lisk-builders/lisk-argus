@@ -20,6 +20,7 @@ export class PeerManager {
     private httpPort: number,
     private wsPort: number,
     readonly nonce: string,
+    readonly version: string,
   ) {
     this.addPeer({
       ip: config.seedNode.host,
@@ -71,6 +72,7 @@ export class PeerManager {
           ownWSPort: this.wsPort,
         },
         this.nonce,
+        this.version,
       ),
     );
   }

@@ -20,13 +20,17 @@ export class LiskPeer extends events.EventEmitter {
   private _lastHeightUpdate: number = 0;
   private _stuck: boolean = false;
 
-  constructor(readonly _options: PeerOptions, readonly ownNonce: string) {
+  constructor(
+    readonly _options: PeerOptions,
+    readonly ownNonce: string,
+    readonly ownVersion: string,
+  ) {
     super();
 
     this.client = new LiskClient(_options.ip, _options.wsPort, _options.httpPort, {
       nonce: ownNonce,
       nethash: _options.nethash,
-      version: "1.0.0",
+      version: ownVersion,
       os: "linux",
       height: 500,
       wsPort: _options.ownWSPort,
