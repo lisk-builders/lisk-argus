@@ -1,9 +1,10 @@
-import { PeerManager } from "../peers/PeerManager";
-import { LiskPeer } from "../peers/Peer";
-import { Chain } from "./Chain";
-import * as _ from "underscore";
 import { EventEmitter } from "events";
+import { LiskPeer } from "libargus";
+import * as _ from "underscore";
 import * as log from "winston";
+
+import { PeerManager } from "../peers/PeerManager";
+import { Chain } from "./Chain";
 
 /***
  * BlockchainManager keeps tracks of all chains and the associated peers on the Lisk network

@@ -1,9 +1,9 @@
-import { LiskPeer, PeerState } from "./Peer";
-import * as log from "winston";
-import * as _ from "underscore";
+import { LiskPeer, PeerInfo, PeerState } from "libargus";
 import * as semver from "semver";
+import * as _ from "underscore";
+import * as log from "winston";
+
 import { SocketServer } from "../websockets/SocketServer";
-import { PeerInfo } from "./LiskClient";
 
 const config = require("../../src/config.json");
 

@@ -1,6 +1,5 @@
 import * as crypto from "crypto";
-import { NodeStatus } from "../peers/LiskClient";
-import { Block } from "../lib/HttpApi";
+import { Block, NodeStatus } from "libargus";
 
 /***
  * Chain represents a chain on the Lisk network

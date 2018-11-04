@@ -1,5 +1,6 @@
+import { DelegateDetails } from "libargus";
+
 import { Delegate, DelegateMonitor, DelegateStatus } from "../delegates/DelegateMonitor";
-import { DelegateDetails } from "../lib/HttpApi";
 import { RocketChatAdapter } from "./rocket/adapter";
 import { TelegramAdapter } from "./telegram/adapter";
 
