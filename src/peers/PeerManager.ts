@@ -91,29 +91,11 @@ export class PeerManager {
       undefined,
     );
 
-    // Get the connection count of each peer
-    let peerStats = _.countBy(peerList, peer => {
-      return peer.nonce;
-    });
-
-    // Update the knownBy of the peers and remove dead peers
-    for (let peer of this._peers.values()) {
-      peer.knownBy = peerStats[peer.options.nonce.toString()] || 0;
-
-      if (
-        peer.status &&
-        peer.status.height > this.bestHeight /*&& peer.status.version == '1.0.0-beta.6'*/
-      ) {
+    for (const peer of this._peers.values()) {
+      if (peer.status && peer.status.height > this.bestHeight) {
         this.bestHeight = peer.status.height;
         this.bestBroadhash = peer.status.broadhash;
       }
-
-      // // Remove dead peers
-      // if (peer.knownBy == 0 && peer.state == PeerState.OFFLINE) {
-      //     console.log(`removed dead peer ${peer.options.hostname}`);
-      //     peer.destroy();
-      //     delete this.peers[nonce.toString()]
-      // }
     }
 
     // Discover new peers
