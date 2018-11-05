@@ -1,6 +1,7 @@
+import { DelegateDetails } from "libargus";
+
 import { Delegate, DelegateStatus } from "../../delegates/DelegateMonitor";
 import { NotificationAdapter } from "../NotificationManager";
-import { DelegateDetails } from "../../lib/HttpApi";
 import { RocketChatAdapter } from "../rocket/adapter";
 import { convertEpochToSeconds } from "../../utils/generic";
 

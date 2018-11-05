@@ -1,8 +1,9 @@
-import { PeerManager } from "../peers/PeerManager";
 import * as events from "events";
+import { Block, DelegateDetails, ForgerDetail, ForgerMeta } from "libargus";
 import * as _ from "underscore";
 import * as log from "winston";
-import { Block, DelegateDetails, ForgerDetail, ForgerMeta } from "../lib/HttpApi";
+
+import { PeerManager } from "../peers/PeerManager";
 
 /***
  * The DelegateMonitor keeps track of the delegate ranks and forging status of delegates on a Lisk chain
