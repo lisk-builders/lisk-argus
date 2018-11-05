@@ -15,10 +15,7 @@ export class PeerManager {
   private bestHeight: number = 0;
   private bestBroadhash: string = "";
 
-  constructor(
-    private socketServer: SocketServer,
-    private readonly ownNode: OwnNodeOptions,
-  ) {
+  constructor(private socketServer: SocketServer, private readonly ownNode: OwnNodeOptions) {
     this.addPeer({
       ip: config.seedNode.host,
       wsPort: config.seedNode.wsPort,
@@ -47,7 +44,9 @@ export class PeerManager {
    * @param {PeerInfo} peer
    */
   public addPeer(peer: PeerInfo) {
-    if (peer.nonce && (peer.nonce === this.ownNode.nonce || peer.nonce.indexOf("monitoring") != -1)) return;
+    if (peer.nonce === this.ownNode.nonce || peer.nonce.indexOf("monitoring") !== -1) {
+      return;
+    }
     if (this._peers.has(peer.nonce)) return log.debug("peer not added: already connected to peer");
     if (!semver.satisfies(peer.version, config.minVersion))
       return log.debug("peer not added: does not satisfy minVersion", {
@@ -66,7 +65,7 @@ export class PeerManager {
           nethash: config.nethash,
           nonce: peer.nonce,
         },
-        this.ownNode
+        this.ownNode,
       ),
     );
   }

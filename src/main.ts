@@ -24,7 +24,7 @@ const ownNode: OwnNodeOptions = {
   nonce: nonce,
   os: "linux",
   version: "1.1.0",
-}
+};
 
 const socketServer = new SocketServer(wsPort, nonce);
 const peerManager = new PeerManager(socketServer, ownNode);
