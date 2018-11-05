@@ -1,4 +1,4 @@
-import { LiskPeer, PeerInfo, PeerState } from "libargus";
+import { Peer, PeerInfo, PeerState } from "libargus";
 import * as semver from "semver";
 import * as _ from "underscore";
 import * as log from "winston";
@@ -20,6 +20,7 @@ export class PeerManager {
     private httpPort: number,
     private wsPort: number,
     readonly nonce: string,
+    readonly os: string,
     readonly version: string,
   ) {
     this.addPeer({
@@ -39,9 +40,9 @@ export class PeerManager {
     socketServer.on("disconnect", data => this.wsServerConnectionChanged(data, false));
   }
 
-  private _peers: Map<string, LiskPeer> = new Map<string, LiskPeer>();
+  private readonly _peers = new Map<string, Peer>();
 
-  get peers(): LiskPeer[] {
+  get peers(): Peer[] {
     return Array.from(this._peers.values());
   }
 
@@ -61,18 +62,21 @@ export class PeerManager {
 
     this._peers.set(
       peer.nonce,
-      new LiskPeer(
+      new Peer(
         {
           ip: peer.ip,
           wsPort: peer.wsPort,
           httpPort: peer.httpPort,
           nethash: config.nethash,
           nonce: peer.nonce,
-          ownHttpPort: this.httpPort,
-          ownWSPort: this.wsPort,
         },
-        this.nonce,
-        this.version,
+        {
+          httpPort: this.httpPort,
+          wsPort: this.wsPort,
+          nonce: this.nonce,
+          os: this.os,
+          version: this.version,
+        }
       ),
     );
   }
@@ -128,7 +132,7 @@ export class PeerManager {
         _.countBy(
           Array.from(this._peers.values()).map(peer => peer.state),
           state => PeerState[state],
-        )["ONLINE"]
+        )[PeerState.Online]
       } peers`,
     );
     log.debug(
@@ -136,7 +140,7 @@ export class PeerManager {
         _.countBy(
           Array.from(this._peers.values()).map(
             peer =>
-              peer.status != null && peer.state == PeerState.ONLINE ? peer.status.height : 0,
+              peer.status != null && peer.state == PeerState.Online ? peer.status.height : 0,
           ),
           height => height,
         ),
@@ -147,17 +151,17 @@ export class PeerManager {
         _.countBy(
           Array.from(this._peers.values()).map(peer => peer.state),
           state => PeerState[state],
-        )["OFFLINE"]
+        )[PeerState.Offline]
       } peers`,
     );
   }
 
   /***
    * Get a peer with the best height and activated HTTP API
-   * @returns {LiskPeer}
+   * @returns {Peer}
    */
-  public getBestHTTPPeer(): LiskPeer {
-    let bestPeer: LiskPeer | undefined;
+  public getBestHTTPPeer(): Peer {
+    let bestPeer: Peer | undefined;
     let bestHeight = 0;
 
     // Shuffle peers to guarantee that we use different ones every time

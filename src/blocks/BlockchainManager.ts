@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { LiskPeer } from "libargus";
+import { Peer } from "libargus";
 import * as _ from "underscore";
 import * as log from "winston";
 
@@ -48,7 +48,7 @@ export class BlockchainManager extends EventEmitter {
     let chain = new Chain();
 
     return new Promise((resolve, reject) => {
-      peer.client.http
+      peer.http
         .getBlocks()
         .then(response => chain.updateBlocks(response.data))
         .then(onChain => {
@@ -63,9 +63,9 @@ export class BlockchainManager extends EventEmitter {
 
   /***
    * Processes peers and their broadhash data to detect forks and associate the peer with a chain
-   * @param {Array<LiskPeer>} peers
+   * @param {Array<Peer>} peers
    */
-  processPeers(peers: Array<LiskPeer>): void {
+  processPeers(peers: Array<Peer>): void {
     // STEP 0 - remove stale peers
     for (let peer of this._peerChainMap.keys()) {
       if (!_.contains(peers.map(peer => (peer.status ? peer.status.nonce : "")), peer)) {

@@ -96,7 +96,7 @@ export class DelegateMonitor extends events.EventEmitter {
   private updateForgers(): Promise<void> {
     return this.peerManager
       .getBestHTTPPeer()
-      .client.http.getForgers()
+      .http.getForgers()
       .then(response => this.processForgers(response.data, response.meta));
   }
 
@@ -148,7 +148,7 @@ export class DelegateMonitor extends events.EventEmitter {
   private updateBlocks(): Promise<void> {
     return this.peerManager
       .getBestHTTPPeer()
-      .client.http.getBlocks()
+      .http.getBlocks()
       .then(response => this.processBlocks(response.data));
   }
 
@@ -173,7 +173,7 @@ export class DelegateMonitor extends events.EventEmitter {
       if (delegate.details && delegate.details.producedBlocks > 0 && !delegate.lastBlock) {
         delegate.lastBlock = await this.peerManager
           .getBestHTTPPeer()
-          .client.http.getLastBlockByDelegate(delegate.details.account.publicKey);
+          .http.getLastBlockByDelegate(delegate.details.account.publicKey);
       }
     }
   }
@@ -185,7 +185,7 @@ export class DelegateMonitor extends events.EventEmitter {
   private updateDelegates(): Promise<void> {
     return this.peerManager
       .getBestHTTPPeer()
-      .client.http.getDelegates()
+      .http.getDelegates()
       .then(response => this.processDelegates(response.data));
   }
 

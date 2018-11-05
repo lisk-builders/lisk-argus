@@ -13,10 +13,11 @@ const nonce =
     .randomBytes(10)
     .toString("hex")
     .slice(0, 5);
+const os = "linux";
 const version = "1.1.0";
 
 const socketServer = new SocketServer(parseInt(process.argv[2]), nonce);
-const peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]), nonce, version);
+const peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]), nonce, os, version);
 
 let blockManager: BlockchainManager | undefined;
 let delegateMonitor: DelegateMonitor | undefined;
