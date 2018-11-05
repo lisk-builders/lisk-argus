@@ -1,4 +1,4 @@
-import { LiskPeer, PeerInfo, PeerState } from "libargus";
+import { OwnNodeOptions, Peer, PeerInfo, PeerState } from "libargus";
 import * as semver from "semver";
 import * as _ from "underscore";
 import * as log from "winston";
@@ -15,13 +15,7 @@ export class PeerManager {
   private bestHeight: number = 0;
   private bestBroadhash: string = "";
 
-  constructor(
-    private socketServer: SocketServer,
-    private httpPort: number,
-    private wsPort: number,
-    readonly nonce: string,
-    readonly version: string,
-  ) {
+  constructor(private socketServer: SocketServer, private readonly ownNode: OwnNodeOptions) {
     this.addPeer({
       ip: config.seedNode.host,
       wsPort: config.seedNode.wsPort,
@@ -39,9 +33,9 @@ export class PeerManager {
     socketServer.on("disconnect", data => this.wsServerConnectionChanged(data, false));
   }
 
-  private _peers: Map<string, LiskPeer> = new Map<string, LiskPeer>();
+  private readonly _peers = new Map<string, Peer>();
 
-  get peers(): LiskPeer[] {
+  get peers(): Peer[] {
     return Array.from(this._peers.values());
   }
 
@@ -50,7 +44,9 @@ export class PeerManager {
    * @param {PeerInfo} peer
    */
   public addPeer(peer: PeerInfo) {
-    if (peer.nonce && (peer.nonce === this.nonce || peer.nonce.indexOf("monitoring") != -1)) return;
+    if (peer.nonce === this.ownNode.nonce || peer.nonce.indexOf("monitoring") !== -1) {
+      return;
+    }
     if (this._peers.has(peer.nonce)) return log.debug("peer not added: already connected to peer");
     if (!semver.satisfies(peer.version, config.minVersion))
       return log.debug("peer not added: does not satisfy minVersion", {
@@ -61,18 +57,15 @@ export class PeerManager {
 
     this._peers.set(
       peer.nonce,
-      new LiskPeer(
+      new Peer(
         {
           ip: peer.ip,
           wsPort: peer.wsPort,
           httpPort: peer.httpPort,
           nethash: config.nethash,
           nonce: peer.nonce,
-          ownHttpPort: this.httpPort,
-          ownWSPort: this.wsPort,
         },
-        this.nonce,
-        this.version,
+        this.ownNode,
       ),
     );
   }
@@ -91,29 +84,11 @@ export class PeerManager {
       undefined,
     );
 
-    // Get the connection count of each peer
-    let peerStats = _.countBy(peerList, peer => {
-      return peer.nonce;
-    });
-
-    // Update the knownBy of the peers and remove dead peers
-    for (let peer of this._peers.values()) {
-      peer.knownBy = peerStats[peer.options.nonce.toString()] || 0;
-
-      if (
-        peer.status &&
-        peer.status.height > this.bestHeight /*&& peer.status.version == '1.0.0-beta.6'*/
-      ) {
+    for (const peer of this._peers.values()) {
+      if (peer.status && peer.status.height > this.bestHeight) {
         this.bestHeight = peer.status.height;
         this.bestBroadhash = peer.status.broadhash;
       }
-
-      // // Remove dead peers
-      // if (peer.knownBy == 0 && peer.state == PeerState.OFFLINE) {
-      //     console.log(`removed dead peer ${peer.options.hostname}`);
-      //     peer.destroy();
-      //     delete this.peers[nonce.toString()]
-      // }
     }
 
     // Discover new peers
@@ -128,7 +103,7 @@ export class PeerManager {
 
       if (
         _.find(newPeers, item => {
-          return item.nonce === peer.nonce || peer.nonce === this.nonce;
+          return item.nonce === peer.nonce || peer.nonce === this.ownNode.nonce;
         })
       )
         continue;
@@ -146,7 +121,7 @@ export class PeerManager {
         _.countBy(
           Array.from(this._peers.values()).map(peer => peer.state),
           state => PeerState[state],
-        )["ONLINE"]
+        )[PeerState.Online]
       } peers`,
     );
     log.debug(
@@ -154,7 +129,7 @@ export class PeerManager {
         _.countBy(
           Array.from(this._peers.values()).map(
             peer =>
-              peer.status != null && peer.state == PeerState.ONLINE ? peer.status.height : 0,
+              peer.status != null && peer.state == PeerState.Online ? peer.status.height : 0,
           ),
           height => height,
         ),
@@ -165,17 +140,17 @@ export class PeerManager {
         _.countBy(
           Array.from(this._peers.values()).map(peer => peer.state),
           state => PeerState[state],
-        )["OFFLINE"]
+        )[PeerState.Offline]
       } peers`,
     );
   }
 
   /***
    * Get a peer with the best height and activated HTTP API
-   * @returns {LiskPeer}
+   * @returns {Peer}
    */
-  public getBestHTTPPeer(): LiskPeer {
-    let bestPeer: LiskPeer | undefined;
+  public getBestHTTPPeer(): Peer {
+    let bestPeer: Peer | undefined;
     let bestHeight = 0;
 
     // Shuffle peers to guarantee that we use different ones every time

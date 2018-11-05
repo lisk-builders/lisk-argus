@@ -1,3 +1,5 @@
+import { OwnNodeOptions } from "libargus";
+
 import { PeerManager } from "./peers/PeerManager";
 import { SocketServer } from "./websockets/SocketServer";
 import { DelegateMonitor } from "./delegates/DelegateMonitor";
@@ -13,10 +15,19 @@ const nonce =
     .randomBytes(10)
     .toString("hex")
     .slice(0, 5);
-const version = "1.1.0";
 
-const socketServer = new SocketServer(parseInt(process.argv[2]), nonce);
-const peerManager = new PeerManager(socketServer, 5000, parseInt(process.argv[2]), nonce, version);
+const wsPort = parseInt(process.argv[2]);
+
+const ownNode: OwnNodeOptions = {
+  httpPort: 5000,
+  wsPort: wsPort,
+  nonce: nonce,
+  os: "linux",
+  version: "1.1.0",
+};
+
+const socketServer = new SocketServer(wsPort, nonce);
+const peerManager = new PeerManager(socketServer, ownNode);
 
 let blockManager: BlockchainManager | undefined;
 let delegateMonitor: DelegateMonitor | undefined;
